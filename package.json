@@ -8,6 +8,8 @@
     "lint": "eslint .",
     "start": "react-native start",
     "test": "jest",
+
+    "help": "node project.help.js",
     
     "android:clean": "cd android && ./gradlew clean && cd ..",
     
