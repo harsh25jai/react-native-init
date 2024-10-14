@@ -8,22 +8,17 @@
     "lint": "eslint .",
     "start": "react-native start",
     "test": "jest",
-
     "help": "node project.help.js",
-    
     "android:clean": "cd android && ./gradlew clean && cd ..",
-    
     "start-test": "cross-env ENVFILE=.env.test react-native start",
     "android-test": "cross-env ENVFILE=.env.test react-native run-android",
     "ios-test": "cross-env ENVFILE=.env.test react-native run-ios",
     "ci2": "jest --no-cache --coverage --collectCoverage --ci",
-    
     "detox-build:android-debug": "cross-env ENVFILE=.env.test detox build --configuration android.emu.debug",
     "detox-build:ios-debug": "cross-env ENVFILE=.env.test detox build --configuration ios.sim.debug",
-    "detox-test:android-debug":"detox test --configuration android.emu.debug & npm run start-test",
-    "detox-test:ios-debug":"detox test --configuration ios.sim.debug & npm run start-test",
-    "detox:ios-clean":"detox clean-framework-cache && detox build-framework-cache",
-    
+    "detox-test:android-debug": "detox test --configuration android.emu.debug & npm run start-test",
+    "detox-test:ios-debug": "detox test --configuration ios.sim.debug & npm run start-test",
+    "detox:ios-clean": "detox clean-framework-cache && detox build-framework-cache",
     "e2e:build-android-debug": "npm run android:clean && detox build -c android.emu.debug",
     "e2e-test:build-ios-debug": "cross-env ENVFILE=.env.test detox build -c ios.sim.debug",
     "e2e-test:build-ios-release": "cross-env ENVFILE=.env.test detox build -c ios.sim.release",
@@ -33,7 +28,7 @@
     "e2e-test:build-android-release": "cross-env ENVFILE=.env.test npm run android:clean && detox build -c android.emu.release",
     "e2e-test:test-android-debug": "detox test -c android.emu.debug & npm run start-test",
     "e2e-test:test-android-release": "detox test -c android.emu.release",
-    "e2e:ios-clean":"detox clean-framework-cache && detox build-framework-cache"
+    "e2e:ios-clean": "detox clean-framework-cache && detox build-framework-cache"
   },
   "dependencies": {
     "@react-native-community/netinfo": "^11.3.2",
@@ -41,6 +36,7 @@
     "@react-navigation/stack": "^6.4.1",
     "async-retry": "^1.3.3",
     "cross-env": "^7.0.3",
+    "mobx": "^6.13.3",
     "moment": "^2.30.1",
     "react": "18.2.0",
     "react-native": "0.74.4",
