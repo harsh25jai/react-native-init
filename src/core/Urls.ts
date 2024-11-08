@@ -1,0 +1,1 @@
+export const BTC_Ticker = "ticker/tBTCUSD";

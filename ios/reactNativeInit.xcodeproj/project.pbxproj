@@ -9,14 +9,23 @@
 /* Begin PBXBuildFile section */
 		00E356F31AD99517003FC87E /* reactNativeInitTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* reactNativeInitTests.m */; };
 		0C80B921A6F3F58F76C31292 /* libPods-reactNativeInit.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5DCACB8F33CDC322A6C60F78 /* libPods-reactNativeInit.a */; };
+		0D3EF144B0A349949D8B8D89 /* Outfit-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 152E9C180A354CD58E8C6485 /* Outfit-Light.ttf */; };
 		13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.mm */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
+		30A2AE39F58D42E18D07A3AD /* Outfit-Thin.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A7A78A71F42F4A599AD0F037 /* Outfit-Thin.ttf */; };
+		4ADCA7C064D9496FBCA0B35C /* Outfit-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6D25BC45959643F5B5EE41F2 /* Outfit-Bold.ttf */; };
 		7699B88040F8A987B510C191 /* libPods-reactNativeInit-reactNativeInitTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 19F6CBCC0A4E27FBF8BF4A61 /* libPods-reactNativeInit-reactNativeInitTests.a */; };
+		77C6DB5E67D848D8A5281763 /* Outfit-ExtraLight.ttf in Resources */ = {isa = PBXBuildFile; fileRef = E975F4AFAFE947819F8014B7 /* Outfit-ExtraLight.ttf */; };
+		7E021A3B416C4129BFD49B43 /* Outfit-Black.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 3665427781EE4AADA449D2D0 /* Outfit-Black.ttf */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
+		8EE5B71B976B424DBF584DEE /* Outfit-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 06A4866719044EC2A7E184F5 /* Outfit-Medium.ttf */; };
 		976248C32C6265F100C3D9EA /* Config.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 976248C22C6265F100C3D9EA /* Config.xcconfig */; };
 		976248C42C6265F100C3D9EA /* Config.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 976248C22C6265F100C3D9EA /* Config.xcconfig */; };
 		B03DB209F31B176799695B41 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 2944214FFAE203CB36DF521F /* PrivacyInfo.xcprivacy */; };
+		BCBE4CB368994656B7C7F99D /* Outfit-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 7228C5C430FA43588F36C3ED /* Outfit-SemiBold.ttf */; };
+		BFB3F55E3C0C4CD48BF5B947 /* Outfit-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 4B25FD9DE4BC4DDAB38DF27D /* Outfit-Regular.ttf */; };
+		F57F00D869B547E08CB23A1F /* Outfit-ExtraBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = F3EF97F5589C45F4AA6B65E6 /* Outfit-ExtraBold.ttf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -33,6 +42,7 @@
 		00E356EE1AD99517003FC87E /* reactNativeInitTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = reactNativeInitTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		00E356F11AD99517003FC87E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		00E356F21AD99517003FC87E /* reactNativeInitTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = reactNativeInitTests.m; sourceTree = "<group>"; };
+		06A4866719044EC2A7E184F5 /* Outfit-Medium.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Outfit-Medium.ttf"; path = "../src/assets/fonts/Outfit-Medium.ttf"; sourceTree = "<group>"; };
 		13B07F961A680F5B00A75B9A /* reactNativeInit.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = reactNativeInit.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = reactNativeInit/AppDelegate.h; sourceTree = "<group>"; };
 		13B07FB01A68108700A75B9A /* AppDelegate.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = AppDelegate.mm; path = reactNativeInit/AppDelegate.mm; sourceTree = "<group>"; };
@@ -40,16 +50,24 @@
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = reactNativeInit/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = reactNativeInit/main.m; sourceTree = "<group>"; };
 		13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = PrivacyInfo.xcprivacy; path = reactNativeInit/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		152E9C180A354CD58E8C6485 /* Outfit-Light.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Outfit-Light.ttf"; path = "../src/assets/fonts/Outfit-Light.ttf"; sourceTree = "<group>"; };
 		19F6CBCC0A4E27FBF8BF4A61 /* libPods-reactNativeInit-reactNativeInitTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-reactNativeInit-reactNativeInitTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2944214FFAE203CB36DF521F /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xml; name = PrivacyInfo.xcprivacy; path = reactNativeInit/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		3665427781EE4AADA449D2D0 /* Outfit-Black.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Outfit-Black.ttf"; path = "../src/assets/fonts/Outfit-Black.ttf"; sourceTree = "<group>"; };
 		3B4392A12AC88292D35C810B /* Pods-reactNativeInit.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-reactNativeInit.debug.xcconfig"; path = "Target Support Files/Pods-reactNativeInit/Pods-reactNativeInit.debug.xcconfig"; sourceTree = "<group>"; };
+		4B25FD9DE4BC4DDAB38DF27D /* Outfit-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Outfit-Regular.ttf"; path = "../src/assets/fonts/Outfit-Regular.ttf"; sourceTree = "<group>"; };
 		5709B34CF0A7D63546082F79 /* Pods-reactNativeInit.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-reactNativeInit.release.xcconfig"; path = "Target Support Files/Pods-reactNativeInit/Pods-reactNativeInit.release.xcconfig"; sourceTree = "<group>"; };
 		5B7EB9410499542E8C5724F5 /* Pods-reactNativeInit-reactNativeInitTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-reactNativeInit-reactNativeInitTests.debug.xcconfig"; path = "Target Support Files/Pods-reactNativeInit-reactNativeInitTests/Pods-reactNativeInit-reactNativeInitTests.debug.xcconfig"; sourceTree = "<group>"; };
 		5DCACB8F33CDC322A6C60F78 /* libPods-reactNativeInit.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-reactNativeInit.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		6D25BC45959643F5B5EE41F2 /* Outfit-Bold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Outfit-Bold.ttf"; path = "../src/assets/fonts/Outfit-Bold.ttf"; sourceTree = "<group>"; };
+		7228C5C430FA43588F36C3ED /* Outfit-SemiBold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Outfit-SemiBold.ttf"; path = "../src/assets/fonts/Outfit-SemiBold.ttf"; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = reactNativeInit/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		89C6BE57DB24E9ADA2F236DE /* Pods-reactNativeInit-reactNativeInitTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-reactNativeInit-reactNativeInitTests.release.xcconfig"; path = "Target Support Files/Pods-reactNativeInit-reactNativeInitTests/Pods-reactNativeInit-reactNativeInitTests.release.xcconfig"; sourceTree = "<group>"; };
 		976248C22C6265F100C3D9EA /* Config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
+		A7A78A71F42F4A599AD0F037 /* Outfit-Thin.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Outfit-Thin.ttf"; path = "../src/assets/fonts/Outfit-Thin.ttf"; sourceTree = "<group>"; };
+		E975F4AFAFE947819F8014B7 /* Outfit-ExtraLight.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Outfit-ExtraLight.ttf"; path = "../src/assets/fonts/Outfit-ExtraLight.ttf"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
+		F3EF97F5589C45F4AA6B65E6 /* Outfit-ExtraBold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Outfit-ExtraBold.ttf"; path = "../src/assets/fonts/Outfit-ExtraBold.ttf"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -131,6 +149,7 @@
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
 				BBD78D7AC51CEA395F1C20DB /* Pods */,
+				8757BF1134994556B14405D0 /* Resources */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -144,6 +163,22 @@
 				00E356EE1AD99517003FC87E /* reactNativeInitTests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		8757BF1134994556B14405D0 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				3665427781EE4AADA449D2D0 /* Outfit-Black.ttf */,
+				6D25BC45959643F5B5EE41F2 /* Outfit-Bold.ttf */,
+				F3EF97F5589C45F4AA6B65E6 /* Outfit-ExtraBold.ttf */,
+				E975F4AFAFE947819F8014B7 /* Outfit-ExtraLight.ttf */,
+				152E9C180A354CD58E8C6485 /* Outfit-Light.ttf */,
+				06A4866719044EC2A7E184F5 /* Outfit-Medium.ttf */,
+				4B25FD9DE4BC4DDAB38DF27D /* Outfit-Regular.ttf */,
+				7228C5C430FA43588F36C3ED /* Outfit-SemiBold.ttf */,
+				A7A78A71F42F4A599AD0F037 /* Outfit-Thin.ttf */,
+			);
+			name = Resources;
 			sourceTree = "<group>";
 		};
 		BBD78D7AC51CEA395F1C20DB /* Pods */ = {
@@ -255,6 +290,15 @@
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				B03DB209F31B176799695B41 /* PrivacyInfo.xcprivacy in Resources */,
+				7E021A3B416C4129BFD49B43 /* Outfit-Black.ttf in Resources */,
+				4ADCA7C064D9496FBCA0B35C /* Outfit-Bold.ttf in Resources */,
+				F57F00D869B547E08CB23A1F /* Outfit-ExtraBold.ttf in Resources */,
+				77C6DB5E67D848D8A5281763 /* Outfit-ExtraLight.ttf in Resources */,
+				0D3EF144B0A349949D8B8D89 /* Outfit-Light.ttf in Resources */,
+				8EE5B71B976B424DBF584DEE /* Outfit-Medium.ttf in Resources */,
+				BFB3F55E3C0C4CD48BF5B947 /* Outfit-Regular.ttf in Resources */,
+				BCBE4CB368994656B7C7F99D /* Outfit-SemiBold.ttf in Resources */,
+				30A2AE39F58D42E18D07A3AD /* Outfit-Thin.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -478,6 +522,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = SFRA45RYPV;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = reactNativeInit/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -505,6 +550,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = SFRA45RYPV;
 				INFOPLIST_FILE = reactNativeInit/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -596,10 +642,7 @@
 					"-DFOLLY_CFG_NO_COROUTINES=1",
 					"-DFOLLY_HAVE_CLOCK_GETTIME=1",
 				);
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					" ",
-				);
+				OTHER_LDFLAGS = "$(inherited)  ";
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				USE_HERMES = true;
@@ -671,10 +714,7 @@
 					"-DFOLLY_CFG_NO_COROUTINES=1",
 					"-DFOLLY_HAVE_CLOCK_GETTIME=1",
 				);
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					" ",
-				);
+				OTHER_LDFLAGS = "$(inherited)  ";
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				USE_HERMES = true;
