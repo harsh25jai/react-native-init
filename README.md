@@ -4,10 +4,10 @@ This is a new [**React Native**](https://reactnative.dev) project, bootstrapped 
 ## Includes
 
 - [React](https://github.com/facebook/react) & [React Native](https://github.com/facebook/react-native)
-- [Detox](https://reactnavigation.org/)
-- [Cross-Env](https://github.com/reactjs/redux)
-- [Jest](https://github.com/Microsoft/react-native-code-push)
-- [aliasName](https://github.com/getsentry/react-native-sentry)
+- [Detox](https://wix.github.io/Detox/docs/introduction/getting-started)
+- [Cross-Env](https://www.npmjs.com/package/cross-env)
+- [Jest](https://jestjs.io/docs/tutorial-react-native)
+- [aliasName](https://reactnative.dev/docs/typescript#using-custom-path-aliases-with-typescript)
 
 
 # Getting Started
