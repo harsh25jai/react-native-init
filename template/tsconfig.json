@@ -6,13 +6,16 @@
       "*": [
         "src/*"
       ],
-      "@components": [
+      "components": [
         "src/components/"
       ],
-      "@screens": [
+      "components/*": [
+        "src/components/*"
+      ],
+      "screens": [
         "src/screens/"
       ],
-      "@screens/*": [
+      "screens/*": [
         "src/screens/*"
       ],
     },

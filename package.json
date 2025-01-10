@@ -2,7 +2,7 @@
     "name": "react-native-init-template",
     "version": "0.0.1",
     "description": "React Native Init - Pre Setupped Jest Detox ENV Version Control and a lot.",
-    "repository": "git@github.com:Esemesek/react-native-new-template.git",
+    "repository": "git@github.com:harsh25jai/react-native-init.git",
     "author": "Harsh Jaiswal <harsh25jai@github.com>",
     "license": "MIT"
   }
