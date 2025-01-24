@@ -1,9 +1,10 @@
 module.exports = {
   root: true,
   extends: '@react-native',
+  plugins: ['import'],
   rules: {
     // this is for sorting WITHIN an import
-    'sort-imports': ['error', { ignoreCase: true, ignoreDeclarationSort: true }],
+    'sort-imports': ['error', {ignoreCase: true, ignoreDeclarationSort: true}],
     // this is for sorting imports
     'import/order': [
       'error',
