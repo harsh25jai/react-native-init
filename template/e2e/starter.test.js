@@ -1,3 +1,5 @@
+const { device, element, expect, by } = require('detox');
+
 describe('Example', () => {
   beforeAll(async () => {
     await device.launchApp();
