@@ -1,23 +1,5 @@
 {
-  "extends": "@react-native/typescript-config/tsconfig.json",
-  "compilerOptions": {
-    "baseUrl": ".",
-    "paths": {
-      "*": [
-        "src/*"
-      ],
-      "components": [
-        "src/components/"
-      ],
-      "components/*": [
-        "src/components/*"
-      ],
-      "screens": [
-        "src/screens/"
-      ],
-      "screens/*": [
-        "src/screens/*"
-      ],
-    },
-  }
+  "extends": "@react-native/typescript-config",
+  "include": ["**/*.ts", "**/*.tsx"],
+  "exclude": ["**/node_modules", "**/Pods"]
 }
