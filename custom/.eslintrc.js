@@ -1,4 +1,4 @@
-const eslintrc = `module.exports = {
+export const eslintrc = `module.exports = {
   root: true,
   extends: [
     '@react-native',

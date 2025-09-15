@@ -6,6 +6,7 @@ const fs = require('fs');
 const path = require('path');
 const readline = require('readline');
 const { promisify } = require('util');
+const { eslintrc } = require('./custom/.eslintrc');
 
 const rl = readline.createInterface({
   input: process.stdin,
