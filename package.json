@@ -4,5 +4,11 @@
     "description": "React Native Init - Pre Setupped Jest Detox ENV Version Control and a lot.",
     "repository": "git@github.com:harsh25jai/react-native-init.git",
     "author": "Harsh Jaiswal <harsh25jai@github.com>",
-    "license": "MIT"
-  }
+    "license": "MIT",
+    "devDependencies": {
+        "fs": "^0.0.1-security",
+        "path": "^0.12.7",
+        "readline": "^1.3.0",
+        "util": "^0.12.5"
+    }
+}
