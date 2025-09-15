@@ -60,7 +60,7 @@ async function init() {
         'eslint-plugin-react': '^7.33.2',
         'eslint-plugin-react-native': '^4.0.0',
         'eslint-config-prettier': '^9.0.0',
-        'eslint-plugin-prettier': '^5.0.0',
+        'eslint-plugin-prettier': '^3.0.0',
       };
 
       // Write updated package.json
