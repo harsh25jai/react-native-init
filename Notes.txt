@@ -1,0 +1,8 @@
+Create pipeline for e2e testing -> it should create clones from template and test it on different systems like linux, windows and ios
+-> https://github.com/callstack/rock/blob/main/packages/create-app/e2e/e2e.test.ts
+
+
+Things to include-
+Detox
+AliasName
+Custom Eslintric
