@@ -1,10 +1,9 @@
 #!/usr/bin/env node
 
 const readline = require("readline");
-const util = require("util");
 const { exec } = require("child_process");
+const { startSpinner, stopSpinner } = require("./utils/spinner");
 
-// Your dependency list
 const DEPENDENCIES = [
   "axios",
   "react-native-vector-icons",
@@ -12,35 +11,38 @@ const DEPENDENCIES = [
   "@react-navigation/stack",
   "@react-navigation/native-stack",
   "@react-native-async-storage/async-storage",
+  "react-query"
 ];
 
-// State to track selected deps
 let selected = new Array(DEPENDENCIES.length).fill(false);
+let cursor = 0;
 
-// Terminal interface
+// Only run interactively in a real terminal
+if (!process.stdin.isTTY) {
+  console.log("Non-interactive environment detected. Skipping dependency selector.");
+  process.exit(0);
+}
+
 readline.emitKeypressEvents(process.stdin);
-process.stdin.setRawMode(true);
+if (process.stdin.setRawMode) {
+  process.stdin.setRawMode(true);
+}
 
 console.clear();
-console.log("Which dependencies do you want to install?");
-console.log("Press SPACE to toggle, ENTER to confirm.\n");
 
 function renderMenu() {
   console.clear();
   console.log("Which dependencies do you want to install?");
-  console.log("Press SPACE to toggle, ENTER to confirm.\n");
+  console.log("Use ↑/↓ to move, SPACE to toggle, ENTER to confirm.\n");
 
   DEPENDENCIES.forEach((dep, i) => {
     const check = selected[i] ? "[x]" : "[ ]";
-    console.log(`${check}  ${i + 1}. ${dep}`);
+    const pointer = i === cursor ? ">" : " ";
+    console.log(`${pointer} ${check}  ${i + 1}. ${dep}`);
   });
 
-  console.log("\n");
+  console.log("\nPress Ctrl+C to exit.\n");
 }
-
-renderMenu();
-
-let cursor = 0;
 
 function updateCursorMovement(key) {
   if (key.name === "down") cursor = (cursor + 1) % DEPENDENCIES.length;
@@ -58,36 +60,54 @@ function installSelected() {
 
   if (chosen.length === 0) {
     console.log("No dependencies selected. Exiting.");
-    process.exit(0);
+    cleanup(0);
   }
 
   console.log("Installing:");
-  chosen.forEach(dep => console.log("  - " + dep));
+  chosen.forEach((dep) => console.log("  - " + dep));
 
-  console.log("\nRunning npm install...\n");
+  console.log("\nRunning: npm install ...\n");
+  startSpinner();
 
   const installCommand = `npm install ${chosen.join(" ")}`;
+  
+  const child = exec(installCommand, (err, stdout) => {
+    if (stdout) console.log(stdout);
 
-  exec(installCommand, (err, stdout) => {
     if (err) {
+      stopSpinner("❌ Installation failed");
       console.error("Error installing dependencies:", err);
+      cleanup(1);
     } else {
-      console.log(stdout);
+      stopSpinner("✔ Installation complete");
       console.log("\n✨ Installation complete!");
+      cleanup(0);
     }
-    process.exit(0);
   });
+
+  // Mirror real-time npm output
+  child.stdout?.pipe(process.stdout);
+  child.stderr?.pipe(process.stderr);
 }
 
-process.stdin.on("keypress", (str, key) => {
+function cleanup(code) {
+  if (process.stdin.setRawMode) {
+    process.stdin.setRawMode(false);
+  }
+  process.exit(code);
+}
+
+process.stdin.on("keypress", (_str, key) => {
   if (key.name === "c" && key.ctrl) {
     console.log("\nExiting...");
-    process.exit();
+    return cleanup(0);
   }
 
   if (key.name === "space") toggleSelection();
-  if (key.name === "return") installSelected();
+  if (key.name === "return") return installSelected();
 
   updateCursorMovement(key);
   renderMenu();
 });
+
+renderMenu();
