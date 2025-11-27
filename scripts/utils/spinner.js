@@ -3,14 +3,14 @@
 const frames = ["|", "/", "-", "\\"];
 
 let frameIndex = 0;
-let spinnerInterval: NodeJS.Timeout | null = null;
+let spinnerInterval = null;
 
 /**
  * Starts a CLI spinner that animates using | / - \.
  *
  * @param text - Text to display before the spinner.
  */
-export function startSpinner(text: string = "Installing dependencies..."): void {
+export function startSpinner(text = "Installing dependencies...") {
   frameIndex = 0; // reset each start
 
   spinnerInterval = setInterval(() => {
@@ -32,7 +32,7 @@ export function startSpinner(text: string = "Installing dependencies..."): void 
  *
  * @param finalText - Optional text to show after stopping the spinner.
  */
-export function stopSpinner(finalText: string = ""): void {
+export function stopSpinner(finalText = "") {
   if (spinnerInterval) {
     clearInterval(spinnerInterval);
     spinnerInterval = null;
