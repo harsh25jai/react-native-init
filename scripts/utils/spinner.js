@@ -10,7 +10,7 @@ let spinnerInterval = null;
  *
  * @param text - Text to display before the spinner.
  */
-export function startSpinner(text = "Installing dependencies...") {
+function startSpinner(text = "Installing dependencies...") {
   frameIndex = 0; // reset each start
 
   spinnerInterval = setInterval(() => {
@@ -32,7 +32,7 @@ export function startSpinner(text = "Installing dependencies...") {
  *
  * @param finalText - Optional text to show after stopping the spinner.
  */
-export function stopSpinner(finalText = "") {
+function stopSpinner(finalText = "") {
   if (spinnerInterval) {
     clearInterval(spinnerInterval);
     spinnerInterval = null;
@@ -47,3 +47,8 @@ export function stopSpinner(finalText = "") {
     process.stdout.write(finalText + "\n");
   }
 }
+
+module.exports = {
+  startSpinner,
+  stopSpinner,
+};
