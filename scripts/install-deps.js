@@ -1,113 +1,104 @@
 #!/usr/bin/env node
 
-const readline = require("readline");
-const { exec } = require("child_process");
-const { startSpinner, stopSpinner } = require("./utils/spinner");
+const fs = require('fs');
+const path = require('path');
+const prompts = require('prompts');
 
-const DEPENDENCIES = [
-  "axios",
-  "react-native-vector-icons",
-  "@react-navigation/native",
-  "@react-navigation/stack",
-  "@react-navigation/native-stack",
-  "@react-native-async-storage/async-storage",
-  "react-query"
-];
+const DEPS = require('./deps.config');
 
-let selected = new Array(DEPENDENCIES.length).fill(false);
-let cursor = 0;
+const pkgPath = path.join(process.cwd(), 'package.json');
 
-// Only run interactively in a real terminal
-if (!process.stdin.isTTY) {
-  console.log("Non-interactive environment detected. Skipping dependency selector.");
-  process.exit(0);
-}
+/**
+ * Apply selected dependencies to package.json without overriding existing ones
+ */
+function applyDependencies(pkg, selectedDeps) {
+  pkg.dependencies ??= {};
+  pkg.devDependencies ??= {};
 
-readline.emitKeypressEvents(process.stdin);
-if (process.stdin.setRawMode) {
-  process.stdin.setRawMode(true);
-}
+  const report = {
+    added: [],
+    skipped: [],
+  };
 
-console.clear();
+  selectedDeps.forEach((dep) => {
+    const { name, version = 'latest', isDev } = dep;
 
-function renderMenu() {
-  console.clear();
-  console.log("Which dependencies do you want to install?");
-  console.log("Use ↑/↓ to move, SPACE to toggle, ENTER to confirm.\n");
-
-  DEPENDENCIES.forEach((dep, i) => {
-    const check = selected[i] ? "[x]" : "[ ]";
-    const pointer = i === cursor ? ">" : " ";
-    console.log(`${pointer} ${check}  ${i + 1}. ${dep}`);
-  });
-
-  console.log("\nPress Ctrl+C to exit.\n");
-}
-
-function updateCursorMovement(key) {
-  if (key.name === "down") cursor = (cursor + 1) % DEPENDENCIES.length;
-  else if (key.name === "up") cursor = (cursor - 1 + DEPENDENCIES.length) % DEPENDENCIES.length;
-}
-
-function toggleSelection() {
-  selected[cursor] = !selected[cursor];
-}
-
-function installSelected() {
-  const chosen = DEPENDENCIES.filter((_, idx) => selected[idx]);
-
-  console.clear();
-
-  if (chosen.length === 0) {
-    console.log("No dependencies selected. Exiting.");
-    cleanup(0);
-  }
-
-  console.log("Installing:");
-  chosen.forEach((dep) => console.log("  - " + dep));
-
-  console.log("\nRunning: npm install ...\n");
-  startSpinner();
-
-  const installCommand = `npm install ${chosen.join(" ")}`;
-  
-  const child = exec(installCommand, (err, stdout) => {
-    if (stdout) console.log(stdout);
-
-    if (err) {
-      stopSpinner("❌ Installation failed");
-      console.error("Error installing dependencies:", err);
-      cleanup(1);
-    } else {
-      stopSpinner("✔ Installation complete");
-      console.log("\n✨ Installation complete!");
-      cleanup(0);
+    if (pkg.dependencies[name] || pkg.devDependencies[name]) {
+      report.skipped.push({
+        name,
+        version: pkg.dependencies[name] || pkg.devDependencies[name],
+        existingIn: pkg.dependencies[name] ? 'dependencies' : 'devDependencies',
+      });
+      return;
     }
+
+    const target = isDev ? 'devDependencies' : 'dependencies';
+    pkg[target][name] = version;
+
+    report.added.push({
+      name,
+      version,
+      target,
+    });
   });
 
-  // Mirror real-time npm output
-  child.stdout?.pipe(process.stdout);
-  child.stderr?.pipe(process.stderr);
+  return report;
 }
 
-function cleanup(code) {
-  if (process.stdin.setRawMode) {
-    process.stdin.setRawMode(false);
+/**
+ * Pretty log what changed
+ */
+function logDependencyReport(report) {
+  console.log('\nDependency update summary:\n');
+
+  if (report.added.length) {
+    console.log('✔ Added:\n');
+    report.added.forEach(({ name, version, target }) => {
+      console.log(`  • ${name}@${version}  → ${target}`);
+    });
+    console.log('');
   }
-  process.exit(code);
+
+  if (report.skipped.length) {
+    console.log('[~] Skipped (already present):\n');
+    report.skipped.forEach(({ name, version, existingIn }) => {
+      console.log(`  • ${name}@${version} (in ${existingIn})`);
+    });
+    console.log('');
+  }
+
+  if (!report.added.length && !report.skipped.length) {
+    console.log('[!] No dependency changes were required.\n');
+  }
 }
 
-process.stdin.on("keypress", (_str, key) => {
-  if (key.name === "c" && key.ctrl) {
-    console.log("\nExiting...");
-    return cleanup(0);
+(async () => {
+  if (!fs.existsSync(pkgPath)) {
+    console.error('package.json not found');
+    process.exit(1);
   }
 
-  if (key.name === "space") toggleSelection();
-  if (key.name === "return") return installSelected();
+  const { selected } = await prompts({
+    type: 'multiselect',
+    name: 'selected',
+    message: 'Select dependencies to add',
+    choices: DEPS.map((dep) => ({
+      title: `${dep.name}${dep.isDev ? ' (dev)' : ''}`,
+      description: dep.description,
+      value: dep,
+    })),
+  });
 
-  updateCursorMovement(key);
-  renderMenu();
-});
+  if (!selected || selected.length === 0) {
+    console.log('[!] No dependencies selected. Exiting.');
+    process.exit(0);
+  }
 
-renderMenu();
+  const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
+
+  const report = applyDependencies(pkg, selected);
+
+  fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2));
+
+  logDependencyReport(report);
+})();
