@@ -3,102 +3,128 @@
 const fs = require('fs');
 const path = require('path');
 const prompts = require('prompts');
+const { spawnSync } = require('child_process');
 
 const DEPS = require('./deps.config');
 
 const pkgPath = path.join(process.cwd(), 'package.json');
 
 /**
- * Apply selected dependencies to package.json without overriding existing ones
+ * Read package.json safely
  */
-function applyDependencies(pkg, selectedDeps) {
-  pkg.dependencies ??= {};
-  pkg.devDependencies ??= {};
-
-  const report = {
-    added: [],
-    skipped: [],
-  };
-
-  selectedDeps.forEach((dep) => {
-    const { name, version = 'latest', isDev } = dep;
-
-    if (pkg.dependencies[name] || pkg.devDependencies[name]) {
-      report.skipped.push({
-        name,
-        version: pkg.dependencies[name] || pkg.devDependencies[name],
-        existingIn: pkg.dependencies[name] ? 'dependencies' : 'devDependencies',
-      });
-      return;
-    }
-
-    const target = isDev ? 'devDependencies' : 'dependencies';
-    pkg[target][name] = version;
-
-    report.added.push({
-      name,
-      version,
-      target,
-    });
-  });
-
-  return report;
+function readPackageJson() {
+  if (!fs.existsSync(pkgPath)) {
+    console.error('❌ package.json not found');
+    process.exit(1);
+  }
+  return JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
 }
 
 /**
- * Pretty log what changed
+ * Check if dependency already exists
  */
-function logDependencyReport(report) {
-  console.log('\nDependency update summary:\n');
+function isAlreadyInstalled(pkg, depName) {
+  return (
+    pkg.dependencies?.[depName] ||
+    pkg.devDependencies?.[depName]
+  );
+}
 
-  if (report.added.length) {
-    console.log('✔ Added:\n');
-    report.added.forEach(({ name, version, target }) => {
-      console.log(`  • ${name}@${version}  → ${target}`);
-    });
-    console.log('');
-  }
+/**
+ * Run npm install --package-lock-only
+ */
+function runNpmInstall(deps, isDev) {
+  if (!deps.length) return;
 
-  if (report.skipped.length) {
-    console.log('[~] Skipped (already present):\n');
-    report.skipped.forEach(({ name, version, existingIn }) => {
-      console.log(`  • ${name}@${version} (in ${existingIn})`);
-    });
-    console.log('');
-  }
+  const args = [
+    'install',
+    '--package-lock-only',
+    '--silent',
+    ...deps,
+    ...(isDev ? ['--save-dev'] : ['--save']),
+  ];
 
-  if (!report.added.length && !report.skipped.length) {
-    console.log('[!] No dependency changes were required.\n');
+  const result = spawnSync('npm', args, {
+    cwd: process.cwd(),
+    shell: true,
+    stdio: 'ignore', // 👈 THIS hides all output
+  });
+
+  if (result.status !== 0) {
+    console.error('❌ Failed to update dependencies');
+    process.exit(1);
   }
 }
 
-(async () => {
-  if (!fs.existsSync(pkgPath)) {
-    console.error('package.json not found');
-    process.exit(1);
+/**
+ * Pretty logging
+ */
+function logReport({ added, skipped }) {
+  if (added.length) {
+    console.log('✔ Added:\n');
+    added.forEach((d) => {
+      console.log(`  • ${d.name} → ${d.target}`);
+    });
   }
+
+  if (skipped.length) {
+    console.log('\n[~] Skipped (already present):\n');
+    skipped.forEach((d) => {
+      console.log(`  • ${d.name}`);
+    });
+  }
+
+  if (!added.length && !skipped.length) {
+    console.log('No changes made.');
+  }
+
+  console.log('');
+}
+
+(async () => {
+  const pkg = readPackageJson();
 
   const { selected } = await prompts({
     type: 'multiselect',
     name: 'selected',
     message: 'Select dependencies to add',
     choices: DEPS.map((dep) => ({
-      title: `${dep.name}${dep.isDev ? ' (dev)' : ''}`,
+      title: `${dep.name}${dep.isDev ? ' [dev]' : ''}`,
       description: dep.description,
       value: dep,
     })),
   });
 
-  if (!selected || selected.length === 0) {
-    console.log('[!] No dependencies selected. Exiting.');
+  if (!selected?.length) {
+    console.log('\n[!] No dependencies selected. Exiting.');
     process.exit(0);
   }
 
-  const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
+  const report = {
+    added: [],
+    skipped: [],
+  };
 
-  const report = applyDependencies(pkg, selected);
+  const prodDeps = [];
+  const devDeps = [];
 
-  fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2));
+  selected.forEach((dep) => {
+    if (isAlreadyInstalled(pkg, dep.name)) {
+      report.skipped.push({ name: dep.name });
+      return;
+    }
 
-  logDependencyReport(report);
+    if (dep.isDev) {
+      devDeps.push(dep.name);
+      report.added.push({ name: dep.name, target: 'devDependencies' });
+    } else {
+      prodDeps.push(dep.name);
+      report.added.push({ name: dep.name, target: 'dependencies' });
+    }
+  });
+
+  runNpmInstall(prodDeps, false);
+  runNpmInstall(devDeps, true);
+
+  logReport(report);
 })();
