@@ -152,12 +152,15 @@ function logReport({ added, skipped }) {
         report.added.push({ name: depWithVersion, target: 'dependencies' });
       }
     });
+    console.warn('Line 155')
 
     if (isDryRun) {
       console.log('\nDry run enabled — no changes will be made.');
     } else {
+      console.warn('Line 160')
       runNpmInstall(prodDeps, false);
       runNpmInstall(devDeps, true);
+      console.warn('Line 163')
       try {
         runPostInstallHooks(selected);
       } catch (error) {
