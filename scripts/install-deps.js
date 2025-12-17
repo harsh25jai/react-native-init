@@ -83,6 +83,7 @@ function logReport({ added, skipped }) {
 
 (async () => {
   const pkg = readPackageJson();
+  const isDryRun = process.argv.includes('--dry-run');
 
   const { selected } = await prompts({
     type: 'multiselect',
@@ -114,17 +115,24 @@ function logReport({ added, skipped }) {
       return;
     }
 
+    // Append version only if provided
+    const depWithVersion = dep.version ? `${dep.name}@${dep.version}` : dep.name;
+
     if (dep.isDev) {
-      devDeps.push(dep.name);
-      report.added.push({ name: dep.name, target: 'devDependencies' });
+      devDeps.push(depWithVersion);
+      report.added.push({ name: depWithVersion, target: 'devDependencies' });
     } else {
-      prodDeps.push(dep.name);
-      report.added.push({ name: dep.name, target: 'dependencies' });
+      prodDeps.push(depWithVersion);
+      report.added.push({ name: depWithVersion, target: 'dependencies' });
     }
   });
 
-  runNpmInstall(prodDeps, false);
-  runNpmInstall(devDeps, true);
+  if (isDryRun) {
+    console.log('\nDry run enabled — no changes will be made.');
+  } else {
+    runNpmInstall(prodDeps, false);
+    runNpmInstall(devDeps, true);
+  }
 
   logReport(report);
 })();
