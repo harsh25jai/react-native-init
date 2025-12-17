@@ -72,7 +72,7 @@ module.exports = [
     // Testing
     {
         name: 'detox',
-        version: '^3.2.5',
+        version: '^20.46.0',
         isDev: true,
         category: 'testing',
         description: 'End-to-end testing framework',

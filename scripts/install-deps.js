@@ -152,14 +152,24 @@ function logReport({ added, skipped }) {
         report.added.push({ name: depWithVersion, target: 'dependencies' });
       }
     });
-    console.warn('Line 155')
 
     if (isDryRun) {
       console.log('\nDry run enabled — no changes will be made.');
     } else {
-      console.warn('Line 160')
-      runNpmInstall(prodDeps, false);
-      runNpmInstall(devDeps, true);
+      
+       try {
+        runNpmInstall(prodDeps, false);
+      } catch (error) {
+        console.error('\n❌ Error during runNpmInstall prodDeps:', error.message || error);
+        process.exit(1);
+      }
+       try {
+         runNpmInstall(devDeps, true);
+      } catch (error) {
+        console.error('\n❌ Error during runNpmInstall devDeps:', error.message || error);
+        process.exit(1);
+      }
+     
       console.warn('Line 163')
       try {
         runPostInstallHooks(selected);
