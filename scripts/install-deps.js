@@ -75,6 +75,7 @@ function runPostInstallHooks(deps) {
     // }
 
     if (dep.setup && SETUPS[dep.setup]) {
+      console.log(`\n⚙ Running setup for ${dep.name} ${SETUPS[dep.setup]}:`);
       SETUPS[dep.setup]();
     }
   });
@@ -106,58 +107,63 @@ function logReport({ added, skipped }) {
 }
 
 (async () => {
-  const pkg = readPackageJson();
-  const isDryRun = process.argv.includes('--dry-run');
+  try {
+    const pkg = readPackageJson();
+    const isDryRun = process.argv.includes('--dry-run');
 
-  const { selected } = await prompts({
-    type: 'multiselect',
-    name: 'selected',
-    message: 'Select dependencies to add',
-    choices: DEPS.map((dep) => ({
-      title: `${dep.name}${dep.isDev ? ' [dev]' : ''}`,
-      description: dep.description,
-      value: dep,
-    })),
-  });
+    const { selected } = await prompts({
+      type: 'multiselect',
+      name: 'selected',
+      message: 'Select dependencies to add',
+      choices: DEPS.map((dep) => ({
+        title: `${dep.name}${dep.isDev ? ' [dev]' : ''}`,
+        description: dep.description,
+        value: dep,
+      })),
+    });
 
-  if (!selected?.length) {
-    console.log('\n[!] No dependencies selected. Exiting.');
-    process.exit(0);
-  }
-
-  const report = {
-    added: [],
-    skipped: [],
-  };
-
-  const prodDeps = [];
-  const devDeps = [];
-
-  selected.forEach((dep) => {
-    if (isAlreadyInstalled(pkg, dep.name)) {
-      report.skipped.push({ name: dep.name });
-      return;
+    if (!selected?.length) {
+      console.log('\n[!] No dependencies selected. Exiting.');
+      process.exit(0);
     }
 
-    // Append version only if provided
-    const depWithVersion = dep.version ? `${dep.name}@${dep.version}` : dep.name;
+    const report = {
+      added: [],
+      skipped: [],
+    };
 
-    if (dep.isDev) {
-      devDeps.push(depWithVersion);
-      report.added.push({ name: depWithVersion, target: 'devDependencies' });
+    const prodDeps = [];
+    const devDeps = [];
+
+    selected.forEach((dep) => {
+      if (isAlreadyInstalled(pkg, dep.name)) {
+        report.skipped.push({ name: dep.name });
+        return;
+      }
+
+      // Append version only if provided
+      const depWithVersion = dep.version ? `${dep.name}@${dep.version}` : dep.name;
+
+      if (dep.isDev) {
+        devDeps.push(depWithVersion);
+        report.added.push({ name: depWithVersion, target: 'devDependencies' });
+      } else {
+        prodDeps.push(depWithVersion);
+        report.added.push({ name: depWithVersion, target: 'dependencies' });
+      }
+    });
+
+    if (isDryRun) {
+      console.log('\nDry run enabled — no changes will be made.');
     } else {
-      prodDeps.push(depWithVersion);
-      report.added.push({ name: depWithVersion, target: 'dependencies' });
+      runNpmInstall(prodDeps, false);
+      runNpmInstall(devDeps, true);
+      runPostInstallHooks(selected);
     }
-  });
 
-  if (isDryRun) {
-    console.log('\nDry run enabled — no changes will be made.');
-  } else {
-    runNpmInstall(prodDeps, false);
-    runNpmInstall(devDeps, true);
-    runPostInstallHooks(selected);
+    logReport(report);
+  } catch (error) {
+    console.error('\n❌ Error during setup:', error.message || error);
+    process.exit(1);
   }
-
-  logReport(report);
 })();
