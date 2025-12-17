@@ -158,7 +158,12 @@ function logReport({ added, skipped }) {
     } else {
       runNpmInstall(prodDeps, false);
       runNpmInstall(devDeps, true);
-      runPostInstallHooks(selected);
+      try {
+        runPostInstallHooks(selected);
+      } catch (error) {
+        console.error('\n❌ Error during runPostInstallHooks:', error.message || error);
+        process.exit(1);
+      }
     }
 
     logReport(report);
