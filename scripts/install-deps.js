@@ -6,6 +6,7 @@ const prompts = require('prompts');
 const { spawnSync } = require('child_process');
 
 const DEPS = require('./deps.config');
+const SETUPS = require('./deps.setup');
 
 const pkgPath = path.join(process.cwd(), 'package.json');
 
@@ -31,7 +32,7 @@ function isAlreadyInstalled(pkg, depName) {
 }
 
 /**
- * Run npm install --package-lock-only
+ * Runs npm install --package-lock-only
  */
 function runNpmInstall(deps, isDev) {
   if (!deps.length) return;
@@ -54,6 +55,29 @@ function runNpmInstall(deps, isDev) {
     console.error('❌ Failed to update dependencies');
     process.exit(1);
   }
+}
+
+/**
+ * Post-install hooks
+ */
+function runPostInstallHooks(deps) {
+  deps.forEach((dep) => {
+    // if (dep.postInstall) {
+    //   const commands = Array.isArray(dep.postInstall)
+    //     ? dep.postInstall
+    //     : [dep.postInstall];
+
+    //   console.log('\n⚙ Running post-install steps:');
+    //   commands.forEach((cmd) => {
+    //     console.log(`  • ${cmd}`);
+    //     spawnSync(cmd, { stdio: 'inherit', shell: true });
+    //   });
+    // }
+
+    if (dep.setup && SETUPS[dep.setup]) {
+      SETUPS[dep.setup]();
+    }
+  });
 }
 
 /**
@@ -132,6 +156,7 @@ function logReport({ added, skipped }) {
   } else {
     runNpmInstall(prodDeps, false);
     runNpmInstall(devDeps, true);
+    runPostInstallHooks(selected);
   }
 
   logReport(report);

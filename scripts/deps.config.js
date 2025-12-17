@@ -2,6 +2,18 @@
  * Central dependency definition for the template.
  * This file is the single source of truth for all optional dependencies.
  *
+ * {
+ *   name: string;
+ *   version?: string;
+ *   isDev?: boolean;
+ *   category?: string;
+ *   description?: string;
+ *
+ *   // NEW
+ *   postInstall?: string | string[];     // shell commands
+ *   setup?: string;                      // JS handler key
+ * }
+ * 
  * Rules:
  * - `isDev: true`  → devDependencies
  * - `isDev: false` → dependencies
@@ -43,6 +55,7 @@ module.exports = [
         name: 'react-native-config',
         category: 'tooling',
         description: 'Manage environment variables',
+        setup: "react-native-config"
     },
     {
         name: 'eslint',
@@ -63,5 +76,6 @@ module.exports = [
         isDev: true,
         category: 'testing',
         description: 'End-to-end testing framework',
+        setup: "detox"
     },
 ];
