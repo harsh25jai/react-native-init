@@ -75,7 +75,7 @@ function runPostInstallHooks(deps) {
     // }
 
     if (dep.setup && SETUPS[dep.setup]) {
-      console.log(`\n⚙ Running setup for ${dep.name} ${SETUPS[dep.setup]}:`);
+      console.log(`\n⚙ Running setup for ${dep.name}:`);
       SETUPS[dep.setup]();
     }
   });
