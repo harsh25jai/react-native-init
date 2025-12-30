@@ -54,6 +54,40 @@ function getPackageName() {
 }
 
 /**
+ * Detect App Name from app.json or package.json
+ */
+function getAppName() {
+  const appJsonPath = resolvePath('app.json');
+  if (fs.existsSync(appJsonPath)) {
+    try {
+      const appJson = JSON.parse(fs.readFileSync(appJsonPath, 'utf8'));
+      if (appJson.name) return appJson.name;
+    } catch (e) { }
+  }
+
+  const pkgPath = resolvePath('package.json');
+  if (fs.existsSync(pkgPath)) {
+    try {
+      const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
+      if (pkg.name) return pkg.name;
+    } catch (e) { }
+  }
+
+  return 'reactNativeInit'; // fallback
+}
+
+/**
+ * Get comment style based on file extension
+ */
+function getComment(text, filePath) {
+  const ext = path.extname(filePath);
+  if (ext === '.xml') {
+    return `<!-- ${text} -->`;
+  }
+  return `// ${text}`;
+}
+
+/**
  * Idempotent file patcher
  */
 function applyPatches(fileMod) {
@@ -73,7 +107,8 @@ function applyPatches(fileMod) {
 
     const updated = content.replace(patch.hook, (match) => {
       changed = true;
-      return patch.transform(match) + `\n        // [${patch.id}]`;
+      const tag = getComment(`[${patch.id}]`, fileMod.path);
+      return patch.transform(match) + `\n        ${tag}`;
     });
 
     if (updated !== content) {
@@ -116,11 +151,11 @@ function createFiles(fileObj) {
 function stageChanges() {
   if (NO_GIT) return;
 
-  const gitCheck = spawnSync('git', ['rev-parse', '--is-inside-work-tree'], { encoding: 'utf8' });
+  const gitCheck = spawnSync('git', ['rev-parse', '--is-inside-work-tree'], { encoding: 'utf8', cwd: ROOT });
   if (gitCheck.status !== 0) return;
 
   console.log('\n📦 Staging changes in git...');
-  spawnSync('git', ['add', '.'], { stdio: 'inherit' });
+  spawnSync('git', ['add', '.'], { stdio: 'inherit', cwd: ROOT });
 }
 
 /**
@@ -130,10 +165,12 @@ function stageChanges() {
   console.log(`🚀 Starting Detox setup ${DRY_RUN ? '(DRY RUN)' : ''}...`);
 
   const packageName = getPackageName();
+  const appName = getAppName();
   console.log(`📦 Detected Android Package: ${packageName}`);
+  console.log(`📱 Detected App Name: ${appName}`);
 
   // 1. Create Files
-  DETOX_FILES(packageName).forEach(createFiles);
+  DETOX_FILES(packageName, appName).forEach(createFiles);
 
   // 2. Patch Files
   DETOX_MODS.forEach(applyPatches);

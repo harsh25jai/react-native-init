@@ -32,6 +32,11 @@ const DETOX_MODS = [
                 id: 'DETOX_ANDROID_MAVEN_REPO',
                 hook: /apply plugin: "com.facebook.react.rootproject"/,
                 transform: (match) => `${match}\n\n// DETOX: added Detox maven repo\nallprojects {\n    repositories {\n        maven { url("\$rootDir/../node_modules/detox/Detox-android") }\n    }\n}\n`
+            },
+            {
+                id: 'DETOX_ANDROID_KOTLIN_CLASSPATH',
+                hook: /classpath\("org.jetbrains.kotlin:kotlin-gradle-plugin"\)/,
+                transform: (match) => `classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:\$kotlinVersion") // DETOX: updated to use version variable`
             }
         ]
     },
@@ -47,7 +52,7 @@ const DETOX_MODS = [
     }
 ];
 
-const DETOX_FILES = (packageName) => [
+const DETOX_FILES = (packageName, appName) => [
     // --- PROJECT CONFIGS ---
     {
         path: '.detoxrc.js',
@@ -72,13 +77,13 @@ module.exports = {
   apps: {
     'ios.debug': {
       type: 'ios.app',
-      binaryPath: 'ios/build/Build/Products/Debug-iphonesimulator/reactNativeInit.app',
-      build: 'xcodebuild -workspace ios/reactNativeInit.xcworkspace -scheme reactNativeInit -configuration Debug -sdk iphonesimulator -derivedDataPath ios/build'
+      binaryPath: 'ios/build/Build/Products/Debug-iphonesimulator/${appName}.app',
+      build: 'xcodebuild -workspace ios/${appName}.xcworkspace -scheme ${appName} -configuration Debug -sdk iphonesimulator -derivedDataPath ios/build'
     },
     'ios.release': {
       type: 'ios.app',
-      binaryPath: 'ios/build/Build/Products/Release-iphonesimulator/reactNativeInit.app',
-      build: 'xcodebuild -workspace ios/reactNativeInit.xcworkspace -scheme reactNativeInit -configuration Release -sdk iphonesimulator -derivedDataPath ios/build'
+      binaryPath: 'ios/build/Build/Products/Release-iphonesimulator/${appName}.app',
+      build: 'xcodebuild -workspace ios/${appName}.xcworkspace -scheme ${appName} -configuration Release -sdk iphonesimulator -derivedDataPath ios/build'
     },
     'android.debug': {
       type: 'android.apk',
