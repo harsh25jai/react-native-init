@@ -26,7 +26,7 @@ function detoxAlreadyConfigured() {
 function canApplyDetoxPatch() {
   const res = spawnSync(
     'git',
-    ['apply', '--check', 'scripts/patches/detox-setup.patch'],
+    ['apply', '--check', '../patches/detox-setup.patch'],
     { stdio: 'ignore' }
   );
 
