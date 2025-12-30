@@ -24,14 +24,20 @@ function detoxAlreadyConfigured() {
 }
 
 function canApplyDetoxPatch() {
-  const res = spawnSync(
-    'git',
-    ['apply', '--check', '--verbose', '../patches/detox-setup.patch'],
-  );
+  const patchPath = path.join(__dirname, '..', 'patches', 'detox-setup.patch');
 
-  console.warn('Res status:', res.status, res);
+  if (!fs.existsSync(patchPath)) {
+    console.warn('[!] Detox patch not found at', patchPath);
+    return false;
+  }
 
-  return res.status === 0;
+  const res = run('git', ['apply', '--check', '--verbose', patchPath]);
+
+  if (res && res.status !== 0) {
+    console.warn('Res status:', res.status, res.stdout || res.stderr || res);
+  }
+
+  return res && res.status === 0;
 }
 
 function applyDetoxPatch() {
