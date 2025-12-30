@@ -31,7 +31,6 @@ function canApplyDetoxPatch() {
 }
 
 function applyDetoxPatch() {
-  console.log('🧪 Applying Detox modular setup...');
 
   try {
     const codemodPath = path.join(__dirname, '..', 'codemods', 'detox-setup.js');
@@ -41,7 +40,6 @@ function applyDetoxPatch() {
     });
 
     if (res.status === 0) {
-      console.log('✅ Detox modular setup completed successfully.');
       return;
     }
 

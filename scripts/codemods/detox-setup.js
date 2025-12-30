@@ -66,14 +66,12 @@ function getAppName() {
  * Execution
  */
 (async () => {
-  console.log(`🚀 Starting Templated Detox setup ${DRY_RUN ? '(DRY RUN)' : ''}...`);
-
   const packageName = getPackageName();
   const packagePath = packageName.replace(/\./g, '/');
   const appName = getAppName();
 
-  console.log(`📦 Package: ${packageName}`);
-  console.log(`📱 App Name: ${appName}`);
+  console.log(`\n🧪 Configuring Detox for ${appName}...`);
+  console.info(`   - Package: ${packageName}`);
 
   const patchPath = path.join(__dirname, '..', 'patches', 'detox-setup.patch');
   if (!fs.existsSync(patchPath)) {
@@ -101,19 +99,18 @@ function getAppName() {
     }
 
     if (DRY_RUN) {
-      console.log('✅ Dry run completed. Patch is compatible.');
+      console.log('   ✅ Dry run: Patch is compatible.');
     } else {
       const applyArgs = ['apply', '--whitespace=nowarn', tmpPatch];
-      const apply = spawnSync('git', applyArgs, { cwd: ROOT, stdio: 'inherit' });
+      const apply = spawnSync('git', applyArgs, { cwd: ROOT, stdio: 'pipe' });
 
       if (apply.status === 0) {
-        console.log('✅ Detox setup patch applied successfully.');
+        console.log('   ✅ Native patch applied.');
         if (!NO_GIT) {
-          spawnSync('git', ['add', '.'], { cwd: ROOT, stdio: 'inherit' });
-          console.log('📦 Changes staged in git.');
+          stageChanges();
         }
       } else {
-        console.error('❌ Failed to apply patch.');
+        console.error('   ❌ Failed to apply patch.');
         process.exit(1);
       }
     }
@@ -121,5 +118,15 @@ function getAppName() {
     if (fs.existsSync(tmpPatch)) fs.unlinkSync(tmpPatch);
   }
 
-  console.log('\n✨ Detox setup completed.');
+  console.log('\n✨ Detox setup completed successfully.');
 })();
+
+function stageChanges() {
+  if (NO_GIT) return;
+
+  const gitCheck = spawnSync('git', ['rev-parse', '--is-inside-work-tree'], { stdio: 'ignore', cwd: ROOT });
+  if (gitCheck.status !== 0) return;
+
+  spawnSync('git', ['add', '.'], { stdio: 'ignore', cwd: ROOT });
+  console.log('   📦 Changes staged in git.');
+}
