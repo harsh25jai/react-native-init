@@ -1,16 +1,15 @@
-From 9dd47ea5d4895602c00690b3312c7016d2a2eb92 Mon Sep 17 00:00:00 2001
-From: Harsh Jaiswal <harshjaiswal@MacBook-Pro-19.local>
+From: React Native Init <reactnativeinit@reactnativeinit.com>
 Date: Wed, 17 Dec 2025 18:52:46 +0530
 Subject: [PATCH 1/2] feat(detox): add detox related android native setup
 
 ---
  android/app/build.gradle                      | 11 +++++++
- .../androidTest/java/com/reactnativeinit/DetoxTest.java    | 29 +++++++++++++++++++
+ .../androidTest/java/__PACKAGE_PATH__/DetoxTest.java    | 29 +++++++++++++++++++
  android/app/src/main/AndroidManifest.xml      |  3 +-
  .../main/res/xml/network_security_config.xml  |  7 +++++
  android/build.gradle                          |  9 ++++++
  5 files changed, 58 insertions(+), 1 deletion(-)
- create mode 100644 android/app/src/androidTest/java/com/reactnativeinit/DetoxTest.java
+ create mode 100644 android/app/src/androidTest/java/__PACKAGE_PATH__/DetoxTest.java
  create mode 100644 android/app/src/main/res/xml/network_security_config.xml
 
 diff --git a/android/app/build.gradle b/android/app/build.gradle
@@ -47,13 +46,13 @@ index 7fe0fd8..3eee32b 100644
      // The version of react-native is set by the React Native Gradle Plugin
      implementation("com.facebook.react:react-android")
  
-diff --git a/android/app/src/androidTest/java/com/reactnativeinit/DetoxTest.java b/android/app/src/androidTest/java/com/reactnativeinit/DetoxTest.java
+diff --git a/android/app/src/androidTest/java/__PACKAGE_PATH__/DetoxTest.java b/android/app/src/androidTest/java/__PACKAGE_PATH__/DetoxTest.java
 new file mode 100644
 index 0000000..b864ce8
 --- /dev/null
-+++ b/android/app/src/androidTest/java/com/reactnativeinit/DetoxTest.java
++++ b/android/app/src/androidTest/java/__PACKAGE_PATH__/DetoxTest.java
 @@ -0,0 +1,29 @@
-+package com.reactnativeinit;
++package __PACKAGE_NAME__;
 +
 +import com.wix.detox.Detox;
 +import com.wix.detox.config.DetoxConfig;
@@ -82,7 +81,6 @@ index 0000000..b864ce8
 +        Detox.runTests(mActivityRule, detoxConfig);
 +    }
 +}
-\ No newline at end of file
 diff --git a/android/app/src/main/AndroidManifest.xml b/android/app/src/main/AndroidManifest.xml
 index fb78f39..15717b7 100644
 --- a/android/app/src/main/AndroidManifest.xml
@@ -90,7 +88,6 @@ index fb78f39..15717b7 100644
 @@ -10,7 +10,8 @@
        android:allowBackup="false"
        android:theme="@style/AppTheme"
-       android:usesCleartextTraffic="${usesCleartextTraffic}"
 -      android:supportsRtl="true">
 +      android:supportsRtl="true"
 +      android:networkSecurityConfig="@xml/network_security_config">
@@ -110,7 +107,6 @@ index 0000000..c7755e7
 +        <domain includeSubdomains="true">localhost</domain>
 +    </domain-config>
 +</network-security-config>
-\ No newline at end of file
 diff --git a/android/build.gradle b/android/build.gradle
 index dad99b0..0e5700d 100644
 --- a/android/build.gradle
@@ -131,12 +127,9 @@ index dad99b0..0e5700d 100644
      }
  }
  
--- 
-2.39.5 (Apple Git-154)
-
 
 From 59691398391120f21d0d3f8236102d003617454d Mon Sep 17 00:00:00 2001
-From: Harsh Jaiswal <harshjaiswal@MacBook-Pro-19.local>
+From: React Native Init <reactnativeinit@reactnativeinit.com>
 Date: Wed, 17 Dec 2025 18:52:59 +0530
 Subject: [PATCH 2/2] feat(detox): add detox config, e2e folder and example
  test
@@ -177,13 +170,13 @@ index 0000000..9111b5c
 +  apps: {
 +    'ios.debug': {
 +      type: 'ios.app',
-+      binaryPath: 'ios/build/Build/Products/Debug-iphonesimulator/reactNativeInit.app',
-+      build: 'xcodebuild -workspace ios/reactNativeInit.xcworkspace -scheme reactNativeInit -configuration Debug -sdk iphonesimulator -derivedDataPath ios/build'
++      binaryPath: 'ios/build/Build/Products/Debug-iphonesimulator/__APP_NAME__.app',
++      build: 'xcodebuild -workspace ios/__APP_NAME__.xcworkspace -scheme __APP_NAME__ -configuration Debug -sdk iphonesimulator -derivedDataPath ios/build'
 +    },
 +    'ios.release': {
 +      type: 'ios.app',
-+      binaryPath: 'ios/build/Build/Products/Release-iphonesimulator/reactNativeInit.app',
-+      build: 'xcodebuild -workspace ios/reactNativeInit.xcworkspace -scheme reactNativeInit -configuration Release -sdk iphonesimulator -derivedDataPath ios/build'
++      binaryPath: 'ios/build/Build/Products/Release-iphonesimulator/__APP_NAME__.app',
++      build: 'xcodebuild -workspace ios/__APP_NAME__.xcworkspace -scheme __APP_NAME__ -configuration Release -sdk iphonesimulator -derivedDataPath ios/build'
 +    },
 +    'android.debug': {
 +      type: 'android.apk',
@@ -246,7 +239,6 @@ index 0000000..9111b5c
 +    }
 +  }
 +};
-\ No newline at end of file
 diff --git a/e2e/jest.config.js b/e2e/jest.config.js
 new file mode 100644
 index 0000000..4f98020
@@ -298,6 +290,3 @@ index 0000000..9c781a4
 +    await expect(element(by.text('Welcome to React Native'))).toBeVisible();
 +  });
 +});
--- 
-2.39.5 (Apple Git-154)
-
