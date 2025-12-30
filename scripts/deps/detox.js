@@ -58,8 +58,21 @@ function applyDetoxPatch() {
     patchPath,
   ], { stdio: 'inherit' });
 
-  if (res.status !== 0) {
-    throw new Error('Failed to apply Detox patch');
+  if (res && res.status === 0) {
+    return;
+  }
+
+  console.warn('[i] git apply failed, falling back to scripted Detox setup.');
+
+  // Fallback: apply changes via a script that edits files idempotently
+  try {
+    const fallback = require('./detox-fallback');
+    const result = fallback.applyFallback(process.cwd());
+    console.log('✅ Detox fallback applied. Files created:', result.created.length, 'modified:', result.changed.length);
+    result.created.forEach(f => console.log('  +', f));
+    result.changed.forEach(f => console.log('  ~', f));
+  } catch (err) {
+    throw new Error('Failed to apply Detox patch (git apply failed and fallback failed): ' + err.message);
   }
 }
 
