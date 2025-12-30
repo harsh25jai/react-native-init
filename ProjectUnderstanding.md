@@ -32,8 +32,10 @@ A clean React Native project structure pre-configured with:
 TypeScript path mapping (aliases).
 Pre-configured ESLint rules for import sorting and code quality.
 Multi-environment setup (via react-native-config).
-3. Automated Configuration
-One of the project's biggest strengths is the use of patches and codemods to automatically configure tools that usually require manual native code changes (like Detox).
+3. Automated Configuration (Templated Patch System)
+One of the project's biggest strengths is the use of codemods to automatically configure tools that usually require manual native code changes (like Detox).
+- **Templated Patches:** Uses a standard `.patch` file with dynamic placeholders (`__APP_NAME__`, `__PACKAGE_NAME__`).
+- **Dynamic Substitution:** A JS runner swaps these placeholders for actual project values during initialization and applies the patch via `git apply`. This approach balances developer readability with automation power.
 
 💡 Utility & Trade-offs
 High Value

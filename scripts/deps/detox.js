@@ -31,7 +31,6 @@ function canApplyDetoxPatch() {
 }
 
 function applyDetoxPatch() {
-
   try {
     const codemodPath = path.join(__dirname, '..', 'codemods', 'detox-setup.js');
     const res = spawnSync('node', [codemodPath], {
@@ -39,25 +38,11 @@ function applyDetoxPatch() {
       cwd: process.cwd(),
     });
 
-    if (res.status === 0) {
-      return;
+    if (res.status !== 0) {
+      throw new Error(`Detox setup engine failed with code ${res.status}`);
     }
-
-    throw new Error(`Codemod exited with code ${res.status}`);
   } catch (err) {
-    console.warn('[!] Modular setup failed, trying git apply as secondary fallback.');
-
-    // Legacy fallback to patch file if JS setup fails
-    const patchPath = path.join(__dirname, '..', 'patches', 'detox-setup.patch');
-    if (fs.existsSync(patchPath)) {
-      const res = run('git', ['apply', '--whitespace=nowarn', patchPath], { stdio: 'inherit' });
-      if (res && res.status === 0) {
-        console.log('✅ Detox setup completed via git apply.');
-        return;
-      }
-    }
-
-    throw new Error('All Detox setup methods failed: ' + err.message);
+    throw new Error('Detox setup failed: ' + err.message);
   }
 }
 
