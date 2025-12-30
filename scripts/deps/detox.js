@@ -27,7 +27,6 @@ function canApplyDetoxPatch() {
   const res = spawnSync(
     'git',
     ['apply', '--check', '--verbose', '../patches/detox-setup.patch'],
-    { stdio: 'ignore' }
   );
 
   console.warn('Res status:', res.status, res);
