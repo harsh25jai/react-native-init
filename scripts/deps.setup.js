@@ -11,10 +11,10 @@ module.exports = {
     console.log('\n🧪 Setting up Detox (mandatory)');
 
     try {
-      if (!isGitRepo()) {
-        console.warn('[!] Git repository not found. Skipping Detox setup.');
-        return;
-      }
+      // if (!isGitRepo()) {
+      //   console.warn('[!] Git repository not found. Skipping Detox setup.');
+      //   return;
+      // }
 
       // if (!isGitClean()) {
       //   console.log('[!] Git working tree is not clean.');

@@ -30,6 +30,8 @@ function canApplyDetoxPatch() {
     { stdio: 'ignore' }
   );
 
+  console.warn('Res status:', res.status, res);
+
   return res.status === 0;
 }
 

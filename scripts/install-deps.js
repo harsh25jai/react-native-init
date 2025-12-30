@@ -169,8 +169,7 @@ function logReport({ added, skipped }) {
         console.error('\n❌ Error during runNpmInstall devDeps:', error.message || error);
         process.exit(1);
       }
-     
-      console.warn('Line 163')
+ 
       try {
         runPostInstallHooks(selected);
       } catch (error) {
