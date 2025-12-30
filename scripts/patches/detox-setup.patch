@@ -1,151 +1,6 @@
-From: React Native Init <reactnativeinit@reactnativeinit.com>
-Date: Wed, 17 Dec 2025 18:52:46 +0530
-Subject: [PATCH 1/2] feat(detox): add detox related android native setup
-
----
- android/app/build.gradle                      | 11 +++++++
- .../androidTest/java/__PACKAGE_PATH__/DetoxTest.java    | 29 +++++++++++++++++++
- android/app/src/main/AndroidManifest.xml      |  3 +-
- .../main/res/xml/network_security_config.xml  |  7 +++++
- android/build.gradle                          |  9 ++++++
- 5 files changed, 58 insertions(+), 1 deletion(-)
- create mode 100644 android/app/src/androidTest/java/__PACKAGE_PATH__/DetoxTest.java
- create mode 100644 android/app/src/main/res/xml/network_security_config.xml
-
-diff --git a/android/app/build.gradle b/android/app/build.gradle
-index 7fe0fd8..3eee32b 100644
---- a/android/app/build.gradle
-+++ b/android/app/build.gradle
-@@ -84,6 +84,9 @@ android {
-         targetSdkVersion rootProject.ext.targetSdkVersion
-         versionCode 1
-         versionName "1.0"
-+        // react-native detox
-+        testBuildType System.getProperty('testBuildType', 'debug')
-+        testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
-     }
-     signingConfigs {
-         debug {
-@@ -103,11 +106,19 @@ android {
-             signingConfig signingConfigs.debug
-             minifyEnabled enableProguardInReleaseBuilds
-             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
-+            // react-native detox
-+            proguardFile "${rootProject.projectDir}/../node_modules/detox/android/detox/proguard-rules-app.pro"
-         }
-     }
- }
- 
- dependencies {
-+    // react-native detox
-+    androidTestImplementation('com.wix:detox:+')
-+    androidTestImplementation "androidx.test.ext:junit:1.1.3"
-+    androidTestImplementation "androidx.fragment:fragment-testing:1.4.1"
-+    androidTestImplementation "androidx.test:core:1.4.0"
-+
-     // The version of react-native is set by the React Native Gradle Plugin
-     implementation("com.facebook.react:react-android")
- 
-diff --git a/android/app/src/androidTest/java/__PACKAGE_PATH__/DetoxTest.java b/android/app/src/androidTest/java/__PACKAGE_PATH__/DetoxTest.java
-new file mode 100644
-index 0000000..b864ce8
---- /dev/null
-+++ b/android/app/src/androidTest/java/__PACKAGE_PATH__/DetoxTest.java
-@@ -0,0 +1,29 @@
-+package __PACKAGE_NAME__;
-+
-+import com.wix.detox.Detox;
-+import com.wix.detox.config.DetoxConfig;
-+
-+import org.junit.Rule;
-+import org.junit.Test;
-+import org.junit.runner.RunWith;
-+
-+import androidx.test.ext.junit.runners.AndroidJUnit4;
-+import androidx.test.filters.LargeTest;
-+import androidx.test.rule.ActivityTestRule;
-+
-+@RunWith(AndroidJUnit4.class)
-+@LargeTest
-+public class DetoxTest {
-+    @Rule
-+    public ActivityTestRule<MainActivity> mActivityRule = new ActivityTestRule<>(MainActivity.class, false, false);
-+
-+    @Test
-+    public void runDetoxTests() {
-+        DetoxConfig detoxConfig = new DetoxConfig();
-+        detoxConfig.idlePolicyConfig.masterTimeoutSec = 90;
-+        detoxConfig.idlePolicyConfig.idleResourceTimeoutSec = 60;
-+        detoxConfig.rnContextLoadTimeoutSec = (BuildConfig.DEBUG ? 180 : 60);
-+
-+        Detox.runTests(mActivityRule, detoxConfig);
-+    }
-+}
-diff --git a/android/app/src/main/AndroidManifest.xml b/android/app/src/main/AndroidManifest.xml
-index fb78f39..15717b7 100644
---- a/android/app/src/main/AndroidManifest.xml
-+++ b/android/app/src/main/AndroidManifest.xml
-@@ -10,7 +10,8 @@
-       android:allowBackup="false"
-       android:theme="@style/AppTheme"
--      android:supportsRtl="true">
-+      android:supportsRtl="true"
-+      android:networkSecurityConfig="@xml/network_security_config">
-       <activity
-         android:name=".MainActivity"
-         android:label="@string/app_name"
-diff --git a/android/app/src/main/res/xml/network_security_config.xml b/android/app/src/main/res/xml/network_security_config.xml
-new file mode 100644
-index 0000000..c7755e7
---- /dev/null
-+++ b/android/app/src/main/res/xml/network_security_config.xml
-@@ -0,0 +1,7 @@
-+<?xml version="1.0" encoding="utf-8"?>
-+<network-security-config>
-+    <domain-config cleartextTrafficPermitted="true">
-+        <domain includeSubdomains="true">10.0.2.2</domain>
-+        <domain includeSubdomains="true">localhost</domain>
-+    </domain-config>
-+</network-security-config>
-diff --git a/android/build.gradle b/android/build.gradle
-index dad99b0..0e5700d 100644
---- a/android/build.gradle
-+++ b/android/build.gradle
-@@ -15,6 +15,15 @@ buildscript {
-         classpath("com.android.tools.build:gradle")
-         classpath("com.facebook.react:react-native-gradle-plugin")
-         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin")
-+        // react-native detox
-+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion")
-+    }
-+}
-+
-+// react-native detox
-+allprojects {
-+    repositories {
-+        maven { url("$rootDir/../node_modules/detox/Detox-android") }
-     }
- }
- 
-
-From 59691398391120f21d0d3f8236102d003617454d Mon Sep 17 00:00:00 2001
-From: React Native Init <reactnativeinit@reactnativeinit.com>
-Date: Wed, 17 Dec 2025 18:52:59 +0530
-Subject: [PATCH 2/2] feat(detox): add detox config, e2e folder and example
- test
-
----
- .detoxrc.js         | 90 +++++++++++++++++++++++++++++++++++++++++++++
- e2e/jest.config.js  | 12 ++++++
- e2e/starter.test.js | 27 ++++++++++++++
- 3 files changed, 129 insertions(+)
- create mode 100644 .detoxrc.js
- create mode 100644 e2e/jest.config.js
- create mode 100644 e2e/starter.test.js
-
 diff --git a/.detoxrc.js b/.detoxrc.js
 new file mode 100644
-index 0000000..9111b5c
+index 0000000..8a20be5
 --- /dev/null
 +++ b/.detoxrc.js
 @@ -0,0 +1,90 @@
@@ -239,6 +94,132 @@ index 0000000..9111b5c
 +    }
 +  }
 +};
+diff --git a/android/app/build.gradle b/android/app/build.gradle
+index 31b6521..7d0d746 100644
+--- a/android/app/build.gradle
++++ b/android/app/build.gradle
+@@ -84,6 +84,10 @@ android {
+         targetSdkVersion rootProject.ext.targetSdkVersion
+         versionCode 1
+         versionName "1.0"
++        // DETOX: testInstrumentationRunner
++        testBuildType System.getProperty('testBuildType', 'debug')
++        testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
++
+     }
+     signingConfigs {
+         debug {
+@@ -103,6 +107,9 @@ android {
+             signingConfig signingConfigs.debug
+             minifyEnabled enableProguardInReleaseBuilds
+             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
++            // DETOX: proguard rules
++            proguardFile "${rootProject.projectDir}/../node_modules/detox/android/detox/proguard-rules-app.pro"
++
+         }
+     }
+ }
+@@ -111,6 +118,13 @@ dependencies {
+     // The version of react-native is set by the React Native Gradle Plugin
+     implementation("com.facebook.react:react-android")
+ 
++    // DETOX: androidTest dependencies
++    androidTestImplementation('com.wix:detox:+')
++    androidTestImplementation "androidx.test.ext:junit:1.1.3"
++    androidTestImplementation "androidx.fragment:fragment-testing:1.4.1"
++    androidTestImplementation "androidx.test:core:1.4.0"
++
++
+     if (hermesEnabled.toBoolean()) {
+         implementation("com.facebook.react:hermes-android")
+     } else {
+diff --git a/android/app/src/androidTest/java/__PACKAGE_PATH__/DetoxTest.java b/android/app/src/androidTest/java/__PACKAGE_PATH__/DetoxTest.java
+new file mode 100644
+index 0000000..6d04b26
+--- /dev/null
++++ b/android/app/src/androidTest/java/__PACKAGE_PATH__/DetoxTest.java
+@@ -0,0 +1,29 @@
++package __PACKAGE_NAME__;
++
++import com.wix.detox.Detox;
++import com.wix.detox.config.DetoxConfig;
++
++import org.junit.Rule;
++import org.junit.Test;
++import org.junit.runner.RunWith;
++
++import androidx.test.ext.junit.runners.AndroidJUnit4;
++import androidx.test.filters.LargeTest;
++import androidx.test.rule.ActivityTestRule;
++
++@RunWith(AndroidJUnit4.class)
++@LargeTest
++public class DetoxTest {
++    @Rule
++    public ActivityTestRule<MainActivity> mActivityRule = new ActivityTestRule<>(MainActivity.class, false, false);
++
++    @Test
++    public void runDetoxTests() {
++        DetoxConfig detoxConfig = new DetoxConfig();
++        detoxConfig.idlePolicyConfig.masterTimeoutSec = 90;
++        detoxConfig.idlePolicyConfig.idleResourceTimeoutSec = 60;
++        detoxConfig.rnContextLoadTimeoutSec = (BuildConfig.DEBUG ? 180 : 60);
++
++        Detox.runTests(mActivityRule, detoxConfig);
++    }
++}
+diff --git a/android/app/src/main/AndroidManifest.xml b/android/app/src/main/AndroidManifest.xml
+index e189252..b8a0895 100644
+--- a/android/app/src/main/AndroidManifest.xml
++++ b/android/app/src/main/AndroidManifest.xml
+@@ -9,7 +9,9 @@
+       android:roundIcon="@mipmap/ic_launcher_round"
+       android:allowBackup="false"
+       android:theme="@style/AppTheme"
+-      android:supportsRtl="true">
++      android:supportsRtl="true"
++      android:networkSecurityConfig="@xml/network_security_config"
++>
+       <activity
+         android:name=".MainActivity"
+         android:label="@string/app_name"
+diff --git a/android/app/src/main/res/xml/network_security_config.xml b/android/app/src/main/res/xml/network_security_config.xml
+new file mode 100644
+index 0000000..fe0064a
+--- /dev/null
++++ b/android/app/src/main/res/xml/network_security_config.xml
+@@ -0,0 +1,7 @@
++<?xml version="1.0" encoding="utf-8"?>
++<network-security-config>
++    <domain-config cleartextTrafficPermitted="true">
++        <domain includeSubdomains="true">10.0.2.2</domain>
++        <domain includeSubdomains="true">localhost</domain>
++    </domain-config>
++</network-security-config>
+diff --git a/android/build.gradle b/android/build.gradle
+index dad99b0..436923c 100644
+--- a/android/build.gradle
++++ b/android/build.gradle
+@@ -14,8 +14,18 @@ buildscript {
+     dependencies {
+         classpath("com.android.tools.build:gradle")
+         classpath("com.facebook.react:react-native-gradle-plugin")
+-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin")
++        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion") // DETOX: updated to use version variable
++
+     }
+ }
+ 
+ apply plugin: "com.facebook.react.rootproject"
++
++// DETOX: added Detox maven repo
++allprojects {
++    repositories {
++        maven { url("$rootDir/../node_modules/detox/Detox-android") }
++    }
++}
++
++
 diff --git a/e2e/jest.config.js b/e2e/jest.config.js
 new file mode 100644
 index 0000000..4f98020
