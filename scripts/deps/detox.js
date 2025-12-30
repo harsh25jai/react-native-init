@@ -41,45 +41,42 @@ function canApplyDetoxPatch() {
 }
 
 function applyDetoxPatch() {
-  const patchPath = path.join(
-    __dirname,
-    '..',
-    'patches',
-    'detox-setup.patch'
-  );
+  console.log('🧪 Applying Detox modular setup...');
 
-  if (!fs.existsSync(patchPath)) {
-    throw new Error('Detox patch not found');
-  }
-
-  const res = run('git', [
-    'apply',
-    '--whitespace=nowarn',
-    patchPath,
-  ], { stdio: 'inherit' });
-
-  if (res && res.status === 0) {
-    return;
-  }
-
-  console.warn('[i] git apply failed, falling back to scripted Detox setup.');
-
-  // Fallback: apply changes via a script that edits files idempotently
   try {
-    const fallback = require('./detox-fallback');
-    const result = fallback.applyFallback(process.cwd());
-    console.log('✅ Detox fallback applied. Files created:', result.created.length, 'modified:', result.changed.length);
-    result.created.forEach(f => console.log('  +', f));
-    result.changed.forEach(f => console.log('  ~', f));
+    const codemodPath = path.join(__dirname, '..', 'codemods', 'detox-setup.js');
+    const res = spawnSync('node', [codemodPath], {
+      stdio: 'inherit',
+      cwd: process.cwd(),
+    });
+
+    if (res.status === 0) {
+      console.log('✅ Detox modular setup completed successfully.');
+      return;
+    }
+
+    throw new Error(`Codemod exited with code ${res.status}`);
   } catch (err) {
-    throw new Error('Failed to apply Detox patch (git apply failed and fallback failed): ' + err.message);
+    console.warn('[!] Modular setup failed, trying git apply as secondary fallback.');
+
+    // Legacy fallback to patch file if JS setup fails
+    const patchPath = path.join(__dirname, '..', 'patches', 'detox-setup.patch');
+    if (fs.existsSync(patchPath)) {
+      const res = run('git', ['apply', '--whitespace=nowarn', patchPath], { stdio: 'inherit' });
+      if (res && res.status === 0) {
+        console.log('✅ Detox setup completed via git apply.');
+        return;
+      }
+    }
+
+    throw new Error('All Detox setup methods failed: ' + err.message);
   }
 }
 
 module.exports = {
-    applyDetoxPatch,
-    canApplyDetoxPatch,
-    detoxAlreadyConfigured,
-    isGitClean,
-    isGitRepo,
+  applyDetoxPatch,
+  canApplyDetoxPatch,
+  detoxAlreadyConfigured,
+  isGitClean,
+  isGitRepo,
 }
