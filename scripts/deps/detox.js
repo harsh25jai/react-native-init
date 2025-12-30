@@ -24,20 +24,10 @@ function detoxAlreadyConfigured() {
 }
 
 function canApplyDetoxPatch() {
-  const patchPath = path.join(__dirname, '..', 'patches', 'detox-setup.patch');
-
-  if (!fs.existsSync(patchPath)) {
-    console.warn('[!] Detox patch not found at', patchPath);
-    return false;
-  }
-
-  const res = run('git', ['apply', '--check', '--verbose', patchPath]);
-
-  if (res && res.status !== 0) {
-    console.warn('Res status:', res.status, res.stdout || res.stderr || res);
-  }
-
-  return res && res.status === 0;
+  // Now that we have a modular JS setup, we can always attempt it.
+  // The actual check happens inside applyDetoxPatch via the codemod engine.
+  const codemodPath = path.join(__dirname, '..', 'codemods', 'detox-setup.js');
+  return fs.existsSync(codemodPath);
 }
 
 function applyDetoxPatch() {
