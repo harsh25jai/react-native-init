@@ -8,20 +8,7 @@ const {
 
 module.exports = {
   detox() {
-    console.log('\n🧪 Setting up Detox (mandatory)');
-
     try {
-      // if (!isGitRepo()) {
-      //   console.warn('[!] Git repository not found. Skipping Detox setup.');
-      //   return;
-      // }
-
-      // if (!isGitClean()) {
-      //   console.log('[!] Git working tree is not clean.');
-      //   console.log('    Please commit or stash changes and re-run install.');
-      //   return;
-      // }
-
       if (detoxAlreadyConfigured()) {
         console.warn('[i] Detox already configured. Skipping.');
         return;

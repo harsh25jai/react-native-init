@@ -117,8 +117,6 @@ function getAppName() {
   } finally {
     if (fs.existsSync(tmpPatch)) fs.unlinkSync(tmpPatch);
   }
-
-  console.log('\n✨ Detox setup completed successfully.');
 })();
 
 function stageChanges() {
