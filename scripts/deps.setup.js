@@ -4,7 +4,6 @@ const {
   detoxAlreadyConfigured,
   setupDetoxRunner
 } = require('./deps/detox');
-const prompts = require('prompts');
 
 module.exports = {
   async detox() {
@@ -29,6 +28,13 @@ module.exports = {
         'You can retry manually:\n' +
         'git apply scripts/patches/detox-setup.patch'
       );
+    }
+  },
+  'detox-runner'() {
+    try {
+      setupDetoxRunner();
+    } catch (err) {
+      console.error('[!] Detox Runner setup failed:', err.message);
     }
   },
 };
