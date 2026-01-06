@@ -127,6 +127,28 @@ function logReport({ added, skipped }) {
       process.exit(0);
     }
 
+    // Contextual Selection: Detox Helper Runner
+    const detoxDep = selected.find(d => d.setup === 'detox');
+    if (detoxDep) {
+      const { useRunner } = await prompts({
+        type: 'confirm',
+        name: 'useRunner',
+        message: '   └─ Add Detox Helper Runner (interactive CLI)?',
+        initial: true
+      });
+
+      if (useRunner) {
+        // Manually inject the runner config
+        selected.push({
+          name: 'prompts',
+          isDev: true,
+          category: 'testing',
+          description: 'Detox Helper Runner (Interactive CLI)',
+          setup: 'detox-runner'
+        });
+      }
+    }
+
     const report = {
       added: [],
       skipped: [],
@@ -156,20 +178,20 @@ function logReport({ added, skipped }) {
     if (isDryRun) {
       console.log('\nDry run enabled — no changes will be made.');
     } else {
-      
-       try {
+
+      try {
         runNpmInstall(prodDeps, false);
       } catch (error) {
         console.error('\n❌ Error during runNpmInstall prodDeps:', error.message || error);
         process.exit(1);
       }
-       try {
-         runNpmInstall(devDeps, true);
+      try {
+        runNpmInstall(devDeps, true);
       } catch (error) {
         console.error('\n❌ Error during runNpmInstall devDeps:', error.message || error);
         process.exit(1);
       }
- 
+
       try {
         runPostInstallHooks(selected);
       } catch (error) {

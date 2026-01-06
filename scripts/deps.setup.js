@@ -2,12 +2,12 @@ const {
   applyDetoxPatch,
   canApplyDetoxPatch,
   detoxAlreadyConfigured,
-  isGitRepo,
-  isGitClean,
+  setupDetoxRunner
 } = require('./deps/detox');
+const prompts = require('prompts');
 
 module.exports = {
-  detox() {
+  async detox() {
     try {
       if (detoxAlreadyConfigured()) {
         console.warn('[i] Detox already configured. Skipping.');
