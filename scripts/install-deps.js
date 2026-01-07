@@ -202,6 +202,8 @@ function logReport({ added, skipped }) {
 
     if (isDryRun) {
       console.info(`\n Dry run enabled — simulating installation experience...\n`);
+    } else {
+      console.log('')
     }
 
     startSpinner(`${spacing.s2}Preparing installation...`);
