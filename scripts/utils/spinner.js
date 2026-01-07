@@ -1,5 +1,6 @@
 // scripts/utils/spinner.js
 const readline = require('readline');
+const { spacing } = require('./constants');
 
 const frames = ["|", "/", "-", "\\"];
 
@@ -23,7 +24,7 @@ function render() {
  * Starts a CLI spinner that animates using | / - \.
  * @param text - Text to display before the spinner.
  */
-function startSpinner(text = "  Installing dependencies...") {
+function startSpinner(text = `${spacing.s2}Installing dependencies...`) {
   if (spinnerInterval) {
     clearInterval(spinnerInterval);
   }

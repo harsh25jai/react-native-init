@@ -8,6 +8,7 @@ const { spawnSync } = require('child_process');
 const DEPS = require('./deps.config');
 const SETUPS = require('./deps.setup');
 const { stopSpinner, startSpinner, updateText } = require('./utils/spinner');
+const { format, spacing } = require('./utils/constants');
 
 const pkgPath = path.join(process.cwd(), 'package.json');
 
@@ -78,7 +79,7 @@ async function runPostInstallHooks(deps, quiet = false, dryRun = false) {
     // }
 
     if (dep.setup && SETUPS[dep.setup]) {
-      if (!quiet) console.log(`\n  Running setup for ${dep.name}:`);
+      if (!quiet) console.log(`\n${spacing.s2}Running setup for ${dep.name}:`);
       const res = await SETUPS[dep.setup](quiet, dryRun);
       if (res && res.success) {
         results.push({
@@ -97,16 +98,16 @@ async function runPostInstallHooks(deps, quiet = false, dryRun = false) {
  */
 function logReport({ added, skipped }) {
   if (added.length) {
-    console.log('✔ Added:');
+    console.log(format.green('✔ Added:'));
     added.forEach((d) => {
-      console.log(`  • ${d.name} → ${d.target}`);
+      console.log(`${spacing.s2}• ${d.name} → ${d.target}`);
     });
   }
 
   if (skipped.length) {
-    console.log('\n[~] Skipped (already present):\n');
+    console.log('\n[~] Skipped (already present):');
     skipped.forEach((d) => {
-      console.log(`  • ${d.name}`);
+      console.log(`${spacing.s2}• ${d.name}`);
     });
   }
 
@@ -144,7 +145,7 @@ function logReport({ added, skipped }) {
       const { useRunner } = await prompts({
         type: 'confirm',
         name: 'useRunner',
-        message: '   └─ Add Detox Helper Runner (interactive CLI)?',
+        message: `${spacing.s3}└─ Add Detox Helper Runner (interactive CLI)?`,
         initial: true
       });
 
@@ -152,7 +153,7 @@ function logReport({ added, skipped }) {
         // Manually inject the runner config
         selected.push({
           name: 'prompts',
-          displayName: 'Detox Runner',
+          displayName: 'detox-runner',
           isDev: true,
           category: 'testing',
           description: 'Detox Helper Runner (Interactive CLI)',
@@ -191,12 +192,10 @@ function logReport({ added, skipped }) {
     const quiet = true;
 
     if (isDryRun) {
-      console.log('\n  Dry run enabled — simulating installation experience...\n');
-    } else {
-      console.log('');
+      console.info(`\n Dry run enabled — simulating installation experience...\n`);
     }
 
-    startSpinner('  Preparing installation...');
+    startSpinner(`${spacing.s2}Preparing installation...`);
 
     // Helper for simulation delays
     const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
@@ -204,7 +203,7 @@ function logReport({ added, skipped }) {
     try {
       // 1. Prod Dependencies
       if (prodDeps.length) {
-        updateText(' Updating dependencies...');
+        updateText(`${spacing.s2}Updating dependencies...`);
         if (isDryRun) {
           await sleep(1000);
         } else {
@@ -214,7 +213,7 @@ function logReport({ added, skipped }) {
 
       // 2. Dev Dependencies
       if (devDeps.length) {
-        updateText('  Updating devDependencies...');
+        updateText(`${spacing.s2}Updating devDependencies...`);
         if (isDryRun) {
           await sleep(1000);
         } else {
@@ -223,7 +222,7 @@ function logReport({ added, skipped }) {
       }
 
       // 3. Post-install hooks
-      updateText('  Running post-install setup hooks...');
+      updateText(`${spacing.s2}Running post-install setup hooks...`);
       if (isDryRun) {
         await sleep(800);
       }
@@ -233,18 +232,23 @@ function logReport({ added, skipped }) {
       stopSpinner();
 
       // Final "Great Reveal" (Always show if something was done/selected)
-      console.log('\n  Installation complete!\n');
+      console.log(`\n${spacing.s2}Installation complete!\n`);
 
       if (setupResults.length > 0) {
-        console.log('  Summary ' + (isDryRun ? ' (simulated):' : ':'));
+        console.log(format.magenta(`${spacing.s2}Summary`) + (isDryRun ? ' (simulated):' : ':'));
         setupResults.forEach(res => {
-          console.log(`  ✅ ${res.summary} (${res.name})`);
+          console.log(`${spacing.s2}${format.green('✔')} ${format.bold(res.name)}: ${res.summary}`);
         });
 
-        console.info('\n  Instructions:');
+        console.info(format.magenta(`\n${spacing.s2}Instructions:`));
         setupResults.forEach(res => {
           if (res.instructions) {
-            console.log(`   ${res.name}: ${res.instructions}`);
+            // If instructions are multiline (contain newlines), print on new line
+            if (res.instructions.includes('\n')) {
+              console.log(`\n ${res.instructions}`);
+            } else {
+              console.log(`${spacing.s3}${format.bold(res.name)}: ${res.instructions}`);
+            }
           }
         });
         console.log('');
