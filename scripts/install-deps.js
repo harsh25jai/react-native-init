@@ -3,7 +3,7 @@
 const fs = require('fs');
 const path = require('path');
 const prompts = require('prompts');
-const { spawnSync } = require('child_process');
+const { spawn, spawnSync } = require('child_process');
 
 const DEPS = require('./deps.config');
 const SETUPS = require('./deps.setup');
@@ -37,26 +37,35 @@ function isAlreadyInstalled(pkg, depName) {
  * Runs npm install --package-lock-only
  */
 function runNpmInstall(deps, isDev) {
-  if (!deps.length) return;
+  if (!deps.length) return Promise.resolve();
 
-  const args = [
-    'install',
-    '--package-lock-only',
-    '--silent',
-    ...deps,
-    ...(isDev ? ['--save-dev'] : ['--save']),
-  ];
+  return new Promise((resolve, reject) => {
+    const args = [
+      'install',
+      '--package-lock-only',
+      '--silent',
+      ...deps,
+      ...(isDev ? ['--save-dev'] : ['--save']),
+    ];
 
-  const result = spawnSync('npm', args, {
-    cwd: process.cwd(),
-    shell: true,
-    stdio: 'ignore', // 👈 THIS hides all output
+    const child = spawn('npm', args, {
+      cwd: process.cwd(),
+      shell: true,
+      stdio: 'ignore',
+    });
+
+    child.on('close', (code) => {
+      if (code !== 0) {
+        reject(new Error('Failed to update dependencies via npm'));
+      } else {
+        resolve();
+      }
+    });
+
+    child.on('error', (err) => {
+      reject(err);
+    });
   });
-
-  if (result.status !== 0) {
-    console.error('❌ Failed to update dependencies');
-    process.exit(1);
-  }
 }
 
 /**
@@ -207,7 +216,7 @@ function logReport({ added, skipped }) {
         if (isDryRun) {
           await sleep(1000);
         } else {
-          runNpmInstall(prodDeps, false);
+          await runNpmInstall(prodDeps, false);
         }
       }
 
@@ -217,7 +226,7 @@ function logReport({ added, skipped }) {
         if (isDryRun) {
           await sleep(1000);
         } else {
-          runNpmInstall(devDeps, true);
+          await runNpmInstall(devDeps, true);
         }
       }
 

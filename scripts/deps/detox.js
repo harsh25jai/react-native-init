@@ -1,4 +1,4 @@
-const { spawnSync } = require('child_process');
+const { spawn, spawnSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 const { format, spacing } = require('../utils/constants');
@@ -8,6 +8,31 @@ function run(cmd, args, opts = {}) {
     stdio: 'pipe',
     encoding: 'utf8',
     ...opts,
+  });
+}
+
+/**
+ * Async wrapper for spawn
+ */
+function asyncRun(cmd, args, opts = {}) {
+  return new Promise((resolve, reject) => {
+    const child = spawn(cmd, args, {
+      stdio: 'inherit',
+      shell: true,
+      ...opts,
+    });
+
+    child.on('close', (code) => {
+      if (code !== 0) {
+        reject(new Error(`Process ${cmd} exited with code ${code}`));
+      } else {
+        resolve();
+      }
+    });
+
+    child.on('error', (err) => {
+      reject(err);
+    });
   });
 }
 
@@ -36,7 +61,7 @@ function canApplyDetoxPatch() {
  * @param {boolean} quiet - If true, suppresses most console output.
  * @param {boolean} dryRun - If true, only returns metaInfo without making changes.
  */
-function applyDetoxPatch(quiet = false, dryRun = false) {
+async function applyDetoxPatch(quiet = false, dryRun = false) {
   const metaInfo = {
     success: true,
     summary: "Environment setup for Detox (Android/iOS) done.",
@@ -47,14 +72,10 @@ function applyDetoxPatch(quiet = false, dryRun = false) {
 
   try {
     const codemodPath = path.join(__dirname, '..', 'codemods', 'detox-setup.js');
-    const res = spawnSync('node', [codemodPath], {
+    await asyncRun('node', [codemodPath], {
       stdio: quiet ? 'ignore' : 'inherit',
       cwd: process.cwd(),
     });
-
-    if (res.status !== 0) {
-      throw new Error(`Detox setup engine failed with code ${res.status}`);
-    }
 
     return metaInfo;
   } catch (err) {
@@ -65,7 +86,7 @@ function applyDetoxPatch(quiet = false, dryRun = false) {
 /**
  * Setup handler for Detox Runner
  */
-function setupDetoxRunner(quiet = false, dryRun = false) {
+async function setupDetoxRunner(quiet = false, dryRun = false) {
   const metaInfo = {
     success: true,
     summary: "Added Detox Helper Runner (interactive CLI)",
@@ -103,7 +124,8 @@ function setupDetoxRunner(quiet = false, dryRun = false) {
 
   // 3. Update package.json scripts using npm pkg set
   try {
-    spawnSync('npm', ['pkg', 'set', 'scripts.detox:run=node scripts/detox.runner.js'], { stdio: 'ignore', cwd: root });
+    // We use await asyncRun for consistency, even though npm pkg set is fast
+    await asyncRun('npm', ['pkg', 'set', 'scripts.detox:run=node scripts/detox.runner.js'], { stdio: 'ignore', cwd: root });
     if (!quiet) console.log(`${spacing.s3}~ Configured "detox:run" in package.json`);
   } catch (e) {
     if (!quiet) console.warn(`${spacing.s3}[!] Failed to set detox:run script via npm pkg set. Falling back to manual check...`);

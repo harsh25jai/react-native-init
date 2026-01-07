@@ -13,7 +13,7 @@ module.exports = {
         return { success: true, skipped: true, summary: "Detox already configured" };
       }
 
-      const result = applyDetoxPatch(quiet, dryRun);
+      const result = await applyDetoxPatch(quiet, dryRun);
 
       if (!quiet) console.log('✅ Detox setup completed successfully.');
       return result;
@@ -30,9 +30,9 @@ module.exports = {
     }
   },
 
-  'detox-runner'(quiet = false, dryRun = false) {
+  async 'detox-runner'(quiet = false, dryRun = false) {
     try {
-      return setupDetoxRunner(quiet, dryRun);
+      return await setupDetoxRunner(quiet, dryRun);
     } catch (err) {
       if (!quiet) console.error('[!] Detox Runner setup failed:', err.message);
       return { success: false, error: err.message };
