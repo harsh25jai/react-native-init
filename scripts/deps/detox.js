@@ -40,7 +40,7 @@ function applyDetoxPatch(quiet = false, dryRun = false) {
   const metaInfo = {
     success: true,
     summary: "Environment setup for Detox (Android/iOS) done.",
-    instructions: "See https://wix.github.io/Detox/docs/introduction/getting-started/ for detox"
+    instructions: "See https://wix.github.io/Detox/docs/introduction/getting-started/ for the latest up-to-date instructions."
   };
 
   if (dryRun) return metaInfo;
