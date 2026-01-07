@@ -30,17 +30,32 @@ function canApplyDetoxPatch() {
   return fs.existsSync(codemodPath);
 }
 
-function applyDetoxPatch() {
+/**
+ * Apply the Detox template patch.
+ * @param {boolean} quiet - If true, suppresses most console output.
+ * @param {boolean} dryRun - If true, only returns metadata without making changes.
+ */
+function applyDetoxPatch(quiet = false, dryRun = false) {
+  const metadata = {
+    success: true,
+    summary: "Applied native configuration for Detox (Android/iOS)",
+    instructions: "Refer to documentation for running on specific devices"
+  };
+
+  if (dryRun) return metadata;
+
   try {
     const codemodPath = path.join(__dirname, '..', 'codemods', 'detox-setup.js');
     const res = spawnSync('node', [codemodPath], {
-      stdio: 'inherit',
+      stdio: quiet ? 'ignore' : 'inherit',
       cwd: process.cwd(),
     });
 
     if (res.status !== 0) {
       throw new Error(`Detox setup engine failed with code ${res.status}`);
     }
+
+    return metadata;
   } catch (err) {
     throw new Error('Detox setup failed: ' + err.message);
   }
@@ -49,12 +64,20 @@ function applyDetoxPatch() {
 /**
  * Setup handler for Detox Runner
  */
-function setupDetoxRunner() {
+function setupDetoxRunner(quiet = false, dryRun = false) {
+  const metadata = {
+    success: true,
+    summary: "Integrated Detox Helper Runner (interactive CLI)",
+    instructions: "Run 'npm run detox:run' to start interactive testing"
+  };
+
+  if (dryRun) return metadata;
+
   const root = process.cwd();
   const scriptsDir = path.join(root, 'scripts');
   const pkgPath = path.join(root, 'package.json');
 
-  console.log('🧪 Setting up Detox Helper Runner...');
+  if (!quiet) console.log('🧪 Setting up Detox Helper Runner...');
 
   // 1. Ensure scripts directory exists
   if (!fs.existsSync(scriptsDir)) {
@@ -62,7 +85,6 @@ function setupDetoxRunner() {
   }
 
   // 2. Copy runner scripts from templates
-  // Note: These originate from the developer project's scripts/custom directory
   const sourceDir = path.join(__dirname, '..', 'custom');
   const filesToCopy = ['detox.runner.js', 'script.history.js'];
 
@@ -72,8 +94,8 @@ function setupDetoxRunner() {
 
     if (fs.existsSync(src)) {
       fs.copyFileSync(src, dest);
-      console.log(`   + Created scripts/${file}`);
-    } else {
+      if (!quiet) console.log(`   + Created scripts/${file}`);
+    } else if (!quiet) {
       console.warn(`   [!] Source script not found: ${src}`);
     }
   });
@@ -81,10 +103,9 @@ function setupDetoxRunner() {
   // 3. Update package.json scripts using npm pkg set
   try {
     spawnSync('npm', ['pkg', 'set', 'scripts.detox:run=node scripts/detox.runner.js'], { stdio: 'ignore', cwd: root });
-    console.log('   ~ Configured "detox:run" in package.json');
+    if (!quiet) console.log('   ~ Configured "detox:run" in package.json');
   } catch (e) {
-    console.warn('   [!] Failed to set detox:run script via npm pkg set. Falling back to manual check...');
-    // Manual fallback if needed (though npm pkg set is standard now)
+    if (!quiet) console.warn('   [!] Failed to set detox:run script via npm pkg set. Falling back to manual check...');
     if (fs.existsSync(pkgPath)) {
       const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
       pkg.scripts = pkg.scripts || {};
@@ -95,12 +116,13 @@ function setupDetoxRunner() {
     }
   }
 
-  // 4. Ensure 'prompts' is in devDependencies
-  // Since this is run during install-deps.js, we can potentially add it to the pending install list
-  // However, the setup handlers are run AFTER npm install usually (or as part of it).
-  // Let's check if we need to manually add it or if the user handles it.
-  // Fixed: install-deps.js handles adding the dependency to the list before install if we configure it correctly in deps.config.js
-  console.log('✅ Detox Helper Runner setup completed.');
+  if (!quiet) console.log('✅ Detox Helper Runner setup completed.');
+
+  return {
+    success: true,
+    summary: "Integrated Detox Helper Runner (interactive CLI)",
+    instructions: "Run 'npm run detox:run' to start interactive testing"
+  };
 }
 
 module.exports = {

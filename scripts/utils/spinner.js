@@ -4,6 +4,7 @@ const frames = ["|", "/", "-", "\\"];
 
 let frameIndex = 0;
 let spinnerInterval = null;
+let currentText = "";
 
 /**
  * Starts a CLI spinner that animates using | / - \.
@@ -11,7 +12,12 @@ let spinnerInterval = null;
  * @param text - Text to display before the spinner.
  */
 function startSpinner(text = "Installing dependencies...") {
+  if (spinnerInterval) {
+    clearInterval(spinnerInterval);
+  }
+
   frameIndex = 0; // reset each start
+  currentText = text;
 
   spinnerInterval = setInterval(() => {
     if (!process.stdout.isTTY) {
@@ -21,10 +27,18 @@ function startSpinner(text = "Installing dependencies...") {
 
     process.stdout.clearLine(0);
     process.stdout.cursorTo(0);
-    process.stdout.write(`${text} ${frames[frameIndex]}`);
+    process.stdout.write(`${currentText} ${frames[frameIndex]}`);
 
     frameIndex = (frameIndex + 1) % frames.length;
   }, 120);
+}
+
+/**
+ * Updates the text display while the spinner is running.
+ * @param text - New text to display.
+ */
+function updateText(text) {
+  currentText = text;
 }
 
 /**
@@ -50,5 +64,6 @@ function stopSpinner(finalText = "") {
 
 module.exports = {
   startSpinner,
+  updateText,
   stopSpinner,
 };

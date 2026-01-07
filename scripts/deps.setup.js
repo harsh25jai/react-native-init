@@ -6,35 +6,36 @@ const {
 } = require('./deps/detox');
 
 module.exports = {
-  async detox() {
+  async detox(quiet = false, dryRun = false) {
     try {
       if (detoxAlreadyConfigured()) {
-        console.warn('[i] Detox already configured. Skipping.');
-        return;
+        if (!quiet) console.warn('[i] Detox already configured. Skipping.');
+        return { success: true, skipped: true, summary: "Detox already configured" };
       }
 
-      if (!canApplyDetoxPatch()) {
-        console.warn('[!] Detox patch is not compatible with this template version.');
-        return;
-      }
+      const result = applyDetoxPatch(quiet, dryRun);
 
-      applyDetoxPatch();
-
-      console.log('✅ Detox setup completed successfully.');
+      if (!quiet) console.log('✅ Detox setup completed successfully.');
+      return result;
     } catch (err) {
-      console.error('\n[!] Detox setup failed. Installation will continue.');
-      console.error('Reason:', err.message);
-      console.error(
-        'You can retry manually:\n' +
-        'git apply scripts/patches/detox-setup.patch'
-      );
+      if (!quiet) {
+        console.error('\n[!] Detox setup failed. Installation will continue.');
+        console.error('Reason:', err.message);
+        console.error(
+          'You can retry manually:\n' +
+          'git apply scripts/patches/detox-setup.patch'
+        );
+      }
+      return { success: false, error: err.message };
     }
   },
-  'detox-runner'() {
+
+  'detox-runner'(quiet = false, dryRun = false) {
     try {
-      setupDetoxRunner();
+      return setupDetoxRunner(quiet, dryRun);
     } catch (err) {
-      console.error('[!] Detox Runner setup failed:', err.message);
+      if (!quiet) console.error('[!] Detox Runner setup failed:', err.message);
+      return { success: false, error: err.message };
     }
   },
 };

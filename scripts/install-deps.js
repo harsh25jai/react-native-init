@@ -7,6 +7,7 @@ const { spawnSync } = require('child_process');
 
 const DEPS = require('./deps.config');
 const SETUPS = require('./deps.setup');
+const { stopSpinner, startSpinner, updateText } = require('./utils/spinner');
 
 const pkgPath = path.join(process.cwd(), 'package.json');
 
@@ -59,9 +60,11 @@ function runNpmInstall(deps, isDev) {
 
 /**
  * Post-install hooks
+ * @returns {Array<{name: string, summary: string, instructions: string}>}
  */
-function runPostInstallHooks(deps) {
-  deps.forEach((dep) => {
+async function runPostInstallHooks(deps, quiet = false, dryRun = false) {
+  const results = [];
+  for (const dep of deps) {
     // if (dep.postInstall) {
     //   const commands = Array.isArray(dep.postInstall)
     //     ? dep.postInstall
@@ -75,10 +78,18 @@ function runPostInstallHooks(deps) {
     // }
 
     if (dep.setup && SETUPS[dep.setup]) {
-      console.log(`\n⚙ Running setup for ${dep.name}:`);
-      SETUPS[dep.setup]();
+      if (!quiet) console.log(`\n⚙ Running setup for ${dep.name}:`);
+      const res = await SETUPS[dep.setup](quiet, dryRun);
+      if (res && res.success) {
+        results.push({
+          name: dep.name,
+          summary: res.summary,
+          instructions: res.instructions
+        });
+      }
     }
-  });
+  }
+  return results;
 }
 
 /**
@@ -175,33 +186,82 @@ function logReport({ added, skipped }) {
       }
     });
 
+    const setupResults = [];
+    const quiet = true;
+
     if (isDryRun) {
-      console.log('\nDry run enabled — no changes will be made.');
+      console.log('\n🔍 Dry run enabled — simulating installation experience...\n');
     } else {
+      console.log('');
+    }
 
-      try {
-        runNpmInstall(prodDeps, false);
-      } catch (error) {
-        console.error('\n❌ Error during runNpmInstall prodDeps:', error.message || error);
-        process.exit(1);
-      }
-      try {
-        runNpmInstall(devDeps, true);
-      } catch (error) {
-        console.error('\n❌ Error during runNpmInstall devDeps:', error.message || error);
-        process.exit(1);
+    startSpinner('🏗️ Preparing installation...');
+
+    // Helper for simulation delays
+    const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+    try {
+      // 1. Prod Dependencies
+      if (prodDeps.length) {
+        updateText('⛓️‍💥 Updating dependencies...');
+        if (isDryRun) {
+          await sleep(1000);
+        } else {
+          runNpmInstall(prodDeps, false);
+        }
       }
 
-      try {
-        runPostInstallHooks(selected);
-      } catch (error) {
-        console.error('\n❌ Error during runPostInstallHooks:', error.message || error);
-        process.exit(1);
+      // 2. Dev Dependencies
+      if (devDeps.length) {
+        updateText('  Updating devDependencies...');
+        if (isDryRun) {
+          await sleep(1000);
+        } else {
+          runNpmInstall(devDeps, true);
+        }
       }
+
+      // 3. Post-install hooks
+      updateText('  Running post-install setup hooks...');
+      if (isDryRun) {
+        await sleep(800);
+      }
+      const results = await runPostInstallHooks(selected, quiet, isDryRun);
+      setupResults.push(...results);
+
+      stopSpinner();
+
+      // Final "Great Reveal" (Always show if something was done/selected)
+      console.log('\n  Installation complete!\n');
+
+      if (setupResults.length > 0) {
+        console.log('📝 Summary of things done' + (isDryRun ? ' (simulated):' : ':'));
+        setupResults.forEach(res => {
+          console.log(`  ✅ ${res.summary} (${res.name})`);
+        });
+
+        console.log('\n  Instructions :');
+        setupResults.forEach(res => {
+          if (res.instructions) {
+            console.log(`  👉 ${res.name}: ${res.instructions}`);
+          }
+        });
+        console.log('');
+      }
+
+      if (isDryRun) {
+        console.log('[!] Dry run finished. No permanent changes were made to the project.\n');
+      }
+
+    } catch (error) {
+      stopSpinner();
+      console.error('\n❌ Error during installation phase:', error.message || error);
+      process.exit(1);
     }
 
     logReport(report);
   } catch (error) {
+    stopSpinner();
     console.error('\n❌ Error during setup:', error.message || error);
     process.exit(1);
   }
