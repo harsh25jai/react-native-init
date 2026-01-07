@@ -78,11 +78,11 @@ async function runPostInstallHooks(deps, quiet = false, dryRun = false) {
     // }
 
     if (dep.setup && SETUPS[dep.setup]) {
-      if (!quiet) console.log(`\n⚙ Running setup for ${dep.name}:`);
+      if (!quiet) console.log(`\n  Running setup for ${dep.name}:`);
       const res = await SETUPS[dep.setup](quiet, dryRun);
       if (res && res.success) {
         results.push({
-          name: dep.name,
+          name: dep.displayName || dep.name,
           summary: res.summary,
           instructions: res.instructions
         });
@@ -97,7 +97,7 @@ async function runPostInstallHooks(deps, quiet = false, dryRun = false) {
  */
 function logReport({ added, skipped }) {
   if (added.length) {
-    console.log('✔ Added:\n');
+    console.log('✔ Added:');
     added.forEach((d) => {
       console.log(`  • ${d.name} → ${d.target}`);
     });
@@ -152,6 +152,7 @@ function logReport({ added, skipped }) {
         // Manually inject the runner config
         selected.push({
           name: 'prompts',
+          displayName: 'Detox Runner',
           isDev: true,
           category: 'testing',
           description: 'Detox Helper Runner (Interactive CLI)',
@@ -190,12 +191,12 @@ function logReport({ added, skipped }) {
     const quiet = true;
 
     if (isDryRun) {
-      console.log('\n🔍 Dry run enabled — simulating installation experience...\n');
+      console.log('\n  Dry run enabled — simulating installation experience...\n');
     } else {
       console.log('');
     }
 
-    startSpinner('🏗️ Preparing installation...');
+    startSpinner('  Preparing installation...');
 
     // Helper for simulation delays
     const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
@@ -203,7 +204,7 @@ function logReport({ added, skipped }) {
     try {
       // 1. Prod Dependencies
       if (prodDeps.length) {
-        updateText('⛓️‍💥 Updating dependencies...');
+        updateText(' Updating dependencies...');
         if (isDryRun) {
           await sleep(1000);
         } else {
@@ -235,22 +236,22 @@ function logReport({ added, skipped }) {
       console.log('\n  Installation complete!\n');
 
       if (setupResults.length > 0) {
-        console.log('📝 Summary of things done' + (isDryRun ? ' (simulated):' : ':'));
+        console.log('  Summary ' + (isDryRun ? ' (simulated):' : ':'));
         setupResults.forEach(res => {
           console.log(`  ✅ ${res.summary} (${res.name})`);
         });
 
-        console.log('\n  Instructions :');
+        console.info('\n  Instructions:');
         setupResults.forEach(res => {
           if (res.instructions) {
-            console.log(`  👉 ${res.name}: ${res.instructions}`);
+            console.log(`   ${res.name}: ${res.instructions}`);
           }
         });
         console.log('');
       }
 
       if (isDryRun) {
-        console.log('[!] Dry run finished. No permanent changes were made to the project.\n');
+        console.warn('[!] Dry run finished. No permanent changes were made to the project.\n');
       }
 
     } catch (error) {

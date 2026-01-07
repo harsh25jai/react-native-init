@@ -1,4 +1,5 @@
-// scripts/utils/spinner.ts
+// scripts/utils/spinner.js
+const readline = require('readline');
 
 const frames = ["|", "/", "-", "\\"];
 
@@ -7,30 +8,39 @@ let spinnerInterval = null;
 let currentText = "";
 
 /**
+ * Internal render function
+ */
+function render() {
+  if (!process.stdout.isTTY) {
+    return;
+  }
+  readline.clearLine(process.stdout, 0);
+  readline.cursorTo(process.stdout, 0);
+  process.stdout.write(`${currentText} ${frames[frameIndex]}`);
+}
+
+/**
  * Starts a CLI spinner that animates using | / - \.
- *
  * @param text - Text to display before the spinner.
  */
-function startSpinner(text = "Installing dependencies...") {
+function startSpinner(text = "  Installing dependencies...") {
   if (spinnerInterval) {
     clearInterval(spinnerInterval);
   }
 
-  frameIndex = 0; // reset each start
+  frameIndex = 0;
   currentText = text;
 
-  spinnerInterval = setInterval(() => {
-    if (!process.stdout.isTTY) {
-      // Fallback if not in a real terminal
-      return;
-    }
-
-    process.stdout.clearLine(0);
-    process.stdout.cursorTo(0);
-    process.stdout.write(`${currentText} ${frames[frameIndex]}`);
-
-    frameIndex = (frameIndex + 1) % frames.length;
-  }, 120);
+  if (process.stdout.isTTY) {
+    render();
+    spinnerInterval = setInterval(() => {
+      frameIndex = (frameIndex + 1) % frames.length;
+      render();
+    }, 120);
+  } else {
+    // Non-TTY Fallback: Just log the text once
+    console.log(`[i] ${text}`);
+  }
 }
 
 /**
@@ -39,11 +49,15 @@ function startSpinner(text = "Installing dependencies...") {
  */
 function updateText(text) {
   currentText = text;
+  if (!process.stdout.isTTY) {
+    console.log(`[i] ${text}`);
+  } else {
+    render();
+  }
 }
 
 /**
  * Stops the spinner and optionally prints a final line of text.
- *
  * @param finalText - Optional text to show after stopping the spinner.
  */
 function stopSpinner(finalText = "") {
@@ -53,8 +67,8 @@ function stopSpinner(finalText = "") {
   }
 
   if (process.stdout.isTTY) {
-    process.stdout.clearLine(0);
-    process.stdout.cursorTo(0);
+    readline.clearLine(process.stdout, 0);
+    readline.cursorTo(process.stdout, 0);
   }
 
   if (finalText) {
