@@ -5,6 +5,9 @@
     "repository": "git@github.com:harsh25jai/react-native-init.git",
     "author": "Harsh Jaiswal <harsh25jai@github.com>",
     "license": "MIT",
+    "scripts": {
+        "test": "node scripts/install-deps.js --dry-run"
+    },
     "dependencies": {
         "fs": "^0.0.1-security",
         "path": "^0.12.7",

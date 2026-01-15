@@ -171,6 +171,19 @@ function logReport({ added, skipped }) {
       }
     }
 
+    // Contextual Selection: React Native Config (CLI dependency)
+    const rnConfigDep = selected.find(d => d.name === 'react-native-config');
+    if (rnConfigDep) {
+      // ensure prompts is present for run-env.js
+      if (!selected.find(d => d.name === 'prompts')) {
+        selected.push({
+          name: 'prompts',
+          isDev: true,
+          description: 'Required for interactive environment scripts',
+        });
+      }
+    }
+
     const report = {
       added: [],
       skipped: [],
@@ -237,10 +250,10 @@ function logReport({ added, skipped }) {
       if (isDryRun) {
         await sleep(800);
       }
+      stopSpinner();
+
       const results = await runPostInstallHooks(selected, quiet, isDryRun);
       setupResults.push(...results);
-
-      stopSpinner();
 
       // Final "Great Reveal" (Always show if something was done/selected)
       console.log(`\n${spacing.s2}Installation complete!\n`);

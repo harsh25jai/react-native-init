@@ -14,11 +14,6 @@ async function setupReactNativeConfig(quiet = false, dryRun = false) {
         instructions: ""
     };
 
-    if (dryRun) {
-        if (!quiet) console.log("Dry run: Skipping file writes for react-native-config");
-        return metaInfo;
-    }
-
     if (!quiet) console.log('\n🔧 Setting up react-native-config...');
 
     // --- 1. OPT-IN WIZARD ---
@@ -125,7 +120,9 @@ async function setupReactNativeConfig(quiet = false, dryRun = false) {
             }
         }
 
-        if (anythingChanged) fs.writeFileSync(gradlePath, content);
+        if (anythingChanged) {
+            if (!dryRun) fs.writeFileSync(gradlePath, content);
+        }
     }
 
     // 1b. Proguard Rules (Always needed for robustness if using config)
@@ -136,7 +133,7 @@ async function setupReactNativeConfig(quiet = false, dryRun = false) {
         const keepLine = `-keep class ${pkg}.BuildConfig { *; }`;
         if (!content.includes('BuildConfig')) {
             const prefix = content.endsWith('\n') ? '' : '\n';
-            fs.appendFileSync(proguardPath, `${prefix}${keepLine}\n`);
+            if (!dryRun) fs.appendFileSync(proguardPath, `${prefix}${keepLine}\n`);
             anythingChanged = true;
             if (!quiet) console.log(`${spacing.s3}✔ Added Proguard rules`);
         }
@@ -164,7 +161,7 @@ async function setupReactNativeConfig(quiet = false, dryRun = false) {
             if (hasFeature('bundleId') && envKey !== 'prod') content += `BUNDLE_ID_SUFFIX=.${envName}\n`;
             if (hasFeature('version')) content += `VERSION_CODE=1\nVERSION_NAME=1.0.0\n`;
 
-            fs.writeFileSync(envPath, content);
+            if (!dryRun) fs.writeFileSync(envPath, content);
             anythingChanged = true;
             if (!quiet) console.log(`${spacing.s3}+ Created ${fileName}`);
         }
@@ -176,7 +173,7 @@ async function setupReactNativeConfig(quiet = false, dryRun = false) {
     const xcconfigDest = resolvePath(ROOT, 'ios/Config.xcconfig');
     if (fs.existsSync(resolvePath(ROOT, 'ios'))) {
         if (!fs.existsSync(xcconfigDest) && fs.existsSync(xcconfigSource)) {
-            fs.copyFileSync(xcconfigSource, xcconfigDest);
+            if (!dryRun) fs.copyFileSync(xcconfigSource, xcconfigDest);
             anythingChanged = true;
             if (!quiet) console.log(`${spacing.s3}+ Created ios/Config.xcconfig`);
         }
@@ -189,20 +186,24 @@ async function setupReactNativeConfig(quiet = false, dryRun = false) {
 
     try {
         if (hasCli) {
-            spawnSync('npm', ['pkg', 'set', 'scripts.env=node scripts/run-env.js'], { stdio: 'ignore', cwd: ROOT });
-            spawnSync('npm', ['pkg', 'set', 'scripts.ios=node scripts/run-env.js ios'], { stdio: 'ignore', cwd: ROOT });
-            spawnSync('npm', ['pkg', 'set', 'scripts.android=node scripts/run-env.js android'], { stdio: 'ignore', cwd: ROOT });
+            if (!dryRun) {
+                spawnSync('npm', ['pkg', 'set', 'scripts.env=node scripts/run-env.js'], { stdio: 'ignore', cwd: ROOT });
+                spawnSync('npm', ['pkg', 'set', 'scripts.ios=node scripts/run-env.js ios'], { stdio: 'ignore', cwd: ROOT });
+                spawnSync('npm', ['pkg', 'set', 'scripts.android=node scripts/run-env.js android'], { stdio: 'ignore', cwd: ROOT });
+            }
             if (!quiet) console.log(`${s}✔ Configured interactive CLI scripts`);
         }
 
         if (hasExplicit) {
-            if (hasEnv('staging')) {
-                spawnSync('npm', ['pkg', 'set', 'scripts.android:staging=ENVFILE=.env.staging react-native run-android'], { stdio: 'ignore', cwd: ROOT });
-                spawnSync('npm', ['pkg', 'set', 'scripts.ios:staging=ENVFILE=.env.staging react-native run-ios'], { stdio: 'ignore', cwd: ROOT });
-            }
-            if (hasEnv('prod')) {
-                spawnSync('npm', ['pkg', 'set', 'scripts.android:prod=ENVFILE=.env.production react-native run-android'], { stdio: 'ignore', cwd: ROOT });
-                spawnSync('npm', ['pkg', 'set', 'scripts.ios:prod=ENVFILE=.env.production react-native run-ios'], { stdio: 'ignore', cwd: ROOT });
+            if (!dryRun) {
+                if (hasEnv('staging')) {
+                    spawnSync('npm', ['pkg', 'set', 'scripts.android:staging=ENVFILE=.env.staging react-native run-android'], { stdio: 'ignore', cwd: ROOT });
+                    spawnSync('npm', ['pkg', 'set', 'scripts.ios:staging=ENVFILE=.env.staging react-native run-ios'], { stdio: 'ignore', cwd: ROOT });
+                }
+                if (hasEnv('prod')) {
+                    spawnSync('npm', ['pkg', 'set', 'scripts.android:prod=ENVFILE=.env.production react-native run-android'], { stdio: 'ignore', cwd: ROOT });
+                    spawnSync('npm', ['pkg', 'set', 'scripts.ios:prod=ENVFILE=.env.production react-native run-ios'], { stdio: 'ignore', cwd: ROOT });
+                }
             }
             if (!quiet) console.log(`${s}✔ Configured explicit environment scripts`);
         }
