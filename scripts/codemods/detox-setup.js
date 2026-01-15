@@ -18,57 +18,18 @@ const report = {
   errors: []
 };
 
-/**
- * Resolve absolute path
- */
-function resolvePath(relPath) {
-  return path.join(ROOT, relPath);
-}
+const { getPackageName, getAppName, resolvePath } = require('../utils/project-helper');
 
-/**
- * Robust Android package name detection
- */
-function getPackageName() {
-  const manifestPath = resolvePath('android/app/src/main/AndroidManifest.xml');
-  if (fs.existsSync(manifestPath)) {
-    const manifest = fs.readFileSync(manifestPath, 'utf8');
-    const m = manifest.match(/package="([^"]+)"/);
-    if (m && m[1]) return m[1];
-  }
-
-  const gradlePath = resolvePath('android/app/build.gradle');
-  if (fs.existsSync(gradlePath)) {
-    const gradle = fs.readFileSync(gradlePath, 'utf8');
-    const m = gradle.match(/namespace\s+['"]([^'"]+)['"]/);
-    if (m && m[1]) return m[1];
-    const appIdMatch = gradle.match(/applicationId\s+['"]([^'"]+)['"]/);
-    if (appIdMatch && appIdMatch[1]) return appIdMatch[1];
-  }
-
-  return 'com.reactnativeinit';
-}
-
-/**
- * Detect App Name
- */
-function getAppName() {
-  const appJsonPath = resolvePath('app.json');
-  if (fs.existsSync(appJsonPath)) {
-    try {
-      const appJson = JSON.parse(fs.readFileSync(appJsonPath, 'utf8'));
-      if (appJson.name) return appJson.name;
-    } catch (e) { }
-  }
-  return 'reactNativeInit';
-}
+// ROOT_ARG and other constants remain the same
+// ...
 
 /**
  * Execution
  */
 (async () => {
-  const packageName = getPackageName();
+  const packageName = getPackageName(ROOT);
   const packagePath = packageName.replace(/\./g, '/');
-  const appName = getAppName();
+  const appName = getAppName(ROOT);
 
   console.log(`\n🧪 Configuring Detox for ${appName}...`);
   console.info(`   - Package: ${packageName}`);

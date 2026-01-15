@@ -44,31 +44,33 @@ module.exports = [
         category: 'storage',
         description: 'Persistent storage',
     },
-    // UI / Icons
+    // UI / Icons 
+    // TODO: Add custom setup to create react-native.config.js and add react native vector icons and running npx react-native-asset
     {
         name: 'react-native-vector-icons',
         category: 'ui',
         description: 'Popular icon library',
     },
-    // Tooling (Dev)
+    // Tooling (Dev) 
     {
         name: 'react-native-config',
         category: 'tooling',
         description: 'Manage environment variables',
         setup: "react-native-config"
     },
-    {
-        name: 'eslint',
-        isDev: true,
-        category: 'tooling',
-        description: 'JavaScript linting',
-    },
-    {
-        name: 'prettier',
-        isDev: true,
-        category: 'tooling',
-        description: 'Code formatter',
-    },
+    // TODO: Already present no package install, just need to add custom config's setups
+    // {
+    //     name: 'eslint',
+    //     isDev: true,
+    //     category: 'tooling',
+    //     description: 'JavaScript linting',
+    // },
+    // {
+    //     name: 'prettier',
+    //     isDev: true,
+    //     category: 'tooling',
+    //     description: 'Code formatter',
+    // },
     // Testing
     {
         name: 'detox',
