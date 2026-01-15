@@ -4,6 +4,7 @@ const {
   detoxAlreadyConfigured,
   setupDetoxRunner
 } = require('./deps/detox');
+const { setupReactNativeConfig } = require('./deps/react-native-config');
 
 module.exports = {
   async detox(quiet = false, dryRun = false) {
@@ -35,6 +36,15 @@ module.exports = {
       return await setupDetoxRunner(quiet, dryRun);
     } catch (err) {
       if (!quiet) console.error('[!] Detox Runner setup failed:', err.message);
+      return { success: false, error: err.message };
+    }
+  },
+
+  async 'react-native-config'(quiet = false, dryRun = false) {
+    try {
+      return await setupReactNativeConfig(quiet, dryRun);
+    } catch (err) {
+      if (!quiet) console.error('[!] react-native-config setup failed:', err.message);
       return { success: false, error: err.message };
     }
   },

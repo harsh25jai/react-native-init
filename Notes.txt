@@ -9,7 +9,7 @@ Custom Eslintric
 
 RN- shows React Native app
 TApp - shows app created using this template
-npx @react-native-community/cli init TApp --template https://github.com/harsh25jai/react-native-init/tree/reactnative-81
+npx @react-native-community/cli init TApp --template https://github.com/harsh25jai/react-native-init/tree/reactnative-81-env
 
 Have to update readme for refrence create something like trusted-rag where we have whole architecture understand
 Write up a medium blog on this 
